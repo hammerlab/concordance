@@ -66,10 +66,11 @@ body {
 
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom,
+    gapBetweenLegendAndChart = 10;
 
 var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width], .1);
+    .rangeRoundBands([0, width - gapBetweenLegendAndChart], .1);
 
 var y = d3.scale.linear()
     .rangeRound([height, 0]);
