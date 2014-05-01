@@ -39,6 +39,7 @@ body {
   callers.forEach(function(caller) {
     callerConcordanceCounts[caller] = zeros(1 + callers.length);
   });
+
   for (var callerSetStr in data) {
     var count = data[callerSetStr];
     var callerSet = callerSetStr.split(',');
@@ -69,7 +70,7 @@ var y = d3.scale.linear()
     .rangeRound([height, 0]);
 
 var color = d3.scale.ordinal()
-    .domain(d3.range(1, callers.length + 1))
+    .domain(d3.range(1, callers.length + 1).reverse())
     .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
 var xAxis = d3.svg.axis()
