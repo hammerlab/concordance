@@ -154,7 +154,7 @@ bars.selectAll("text")
     .attr('dy', '-0.35em')
     .attr('dx', x.rangeBand() / 2)
     .attr('style', 'text-anchor: middle')
-    .text(function(d) { return '' + d.total });
+    .text(function(d) { return d3.format("n")(d.total) });
 
 var legend = yAxisGroup.selectAll(".legend")
     .data(color.domain().slice().reverse())
