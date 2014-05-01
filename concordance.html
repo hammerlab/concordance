@@ -39,13 +39,16 @@ body {
   callers.forEach(function(caller) {
     callerConcordanceCounts[caller] = zeros(1 + callers.length);
   });
+  var unionCounts = zeros(1 + callers.length);
 
   for (var callerSetStr in data) {
     var count = data[callerSetStr];
     var callerSet = callerSetStr.split(',');
+    var numAgreeingCallers = callerSet.length;
     callerSet.forEach(function(caller) {
-      callerConcordanceCounts[caller][callerSet.length] += count;
+      callerConcordanceCounts[caller][numAgreeingCallers] += count;
     });
+    unionCounts[numAgreeingCallers] += count;
   }
 
   data = [];
@@ -54,6 +57,8 @@ body {
     row[0] = caller;
     data.push(row);
   });
+  unionCounts[0] = "Union";
+  data.push(unionCounts);
 </script>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
