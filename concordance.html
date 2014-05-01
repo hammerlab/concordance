@@ -9,6 +9,7 @@ body {
 
 rect {
   stroke-width: 1px;
+  shape-rendering: crispEdges;
   stroke: black;
 }
 
@@ -157,13 +158,13 @@ bars.selectAll("rect")
 
 // data labels
 bars.selectAll("text")
-    .data(function(d) { return [d] })
+    .data(function(d) { return [d]; })
   .enter().append("text")
-    .attr('y', function(d) { return y(d.total) })
+    .attr('y', function(d) { return y(d.total); })
     .attr('dy', '-0.35em')
     .attr('dx', x.rangeBand() / 2)
     .attr('style', 'text-anchor: middle')
-    .text(function(d) { return d3.format("n")(d.total) });
+    .text(function(d) { return d3.format("n")(d.total); });
 
 var legend = yAxisGroup.selectAll(".legend")
     .data(color.domain().slice().reverse())
@@ -177,6 +178,12 @@ legend.append("rect")
     .attr("height", 18)
     .style("fill", color);
 
+var humanizeInteger = d3.scale.ordinal()
+                              .domain(d3.range(0, 10))
+                              .range(["zero", "one", "two", "three",
+                                      "four", "five", "six", "seven",
+                                      "eight", "nine", "ten"]);
+
 legend.append("text")
     .attr("x", 30 + 18 + 6)
     .attr("y", 9)
@@ -185,17 +192,15 @@ legend.append("text")
     .style("fill", color)
     .text(function(d) {
         var callerStr = "";
-        var numstrs = {1: "a single caller", 2: "two callers",
-                       3: "three callers", 4: "four callers",
-                       5: "five callers", 6: "six callers"};
-
-        if (d == callers.length)
+        if (d === 1) {
+            callerStr = "a single caller";
+        } else if (d === callers.length) {
             callerStr = "all callers";
-        else if (d in numstrs)
-            callerStr = numstrs[d];
-        else
+        } else if (d < 10) {
+            callerStr = humanizeInteger(d) + " callers";
+        } else {
             callerStr = d + " callers";
-
+        }
         return "Detected by " + callerStr;
     });
 
