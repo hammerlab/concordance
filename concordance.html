@@ -7,6 +7,19 @@ body {
   font: 10px sans-serif;
 }
 
+rect {
+  stroke-width: 1px;
+  stroke: black;
+}
+
+.legend rect {
+  stroke: none;
+}
+
+.legend text {
+  font-size: 1.4em;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -14,11 +27,7 @@ body {
   shape-rendering: crispEdges;
 }
 
-.bar {
-  fill: steelblue;
-}
-
-.x.axis path {
+.x.axis path, x.axis line {
   display: none;
 }
 
@@ -72,7 +81,7 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
     gapBetweenLegendAndChart = 10;
 
 var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width - gapBetweenLegendAndChart], .1);
+    .rangeRoundBands([0, width - gapBetweenLegendAndChart], .5);
 
 var y = d3.scale.linear()
     .rangeRound([height, 0]);
@@ -128,6 +137,7 @@ var yAxisGroup = svg.append("g")
 yAxisGroup.append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 6)
+    .attr("x", -height + 113)
     .attr("dy", ".71em")
     .style("text-anchor", "end")
     .text("Number of Variant Calls");
@@ -175,10 +185,19 @@ legend.append("text")
     .style("text-anchor", "start")
     .style("fill", color)
     .text(function(d) {
-        return 'Detected by ' +
-            (d == 1 ? 'single caller'
-                    : d == callers.length ? 'all callers'
-                                          : d + ' callers');
+        var callerStr = "";
+        var numstrs = {1: "a single caller", 2: "two callers",
+                       3: "three callers", 4: "four callers",
+                       5: "five callers", 6: "six callers"};
+
+        if (d == callers.length)
+            callerStr = "all callers";
+        else if (d in numstrs)
+            callerStr = numstrs[d];
+        else
+            callerStr = d + " callers";
+
+        return "Detected by " + callerStr;
     });
 
 </script>
