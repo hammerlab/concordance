@@ -7,18 +7,27 @@ body {
   font: 10px sans-serif;
 }
 
-.axis path,
-.axis line {
+rect {
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+  stroke: black;
+}
+
+.legend rect {
+  stroke: none;
+}
+
+.legend text {
+  font-size: 1.4em;
+}
+
+.axis path, .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-.bar {
-  fill: steelblue;
-}
-
-.x.axis path {
+.x.axis path, .x.axis line {
   display: none;
 }
 
@@ -26,6 +35,8 @@ body {
 <body>
 
 <script type="text/javascript">
+  // Convert the output of concordance_counter.py into a 2D array for the stacked bar chart.
+
   function zeros(n) {
     var a = [];
     for (var i = 0; i < n; i++) {
@@ -70,14 +81,19 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
     gapBetweenLegendAndChart = 10;
 
 var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width - gapBetweenLegendAndChart], .1);
+    .rangeRoundBands([0, width - gapBetweenLegendAndChart], .5);
 
 var y = d3.scale.linear()
     .rangeRound([height, 0]);
 
+// Gradient from dark purple to light pink, inspired by "Beyond Venn Diagrams".
+var colorScale = d3.scale.linear()
+    .domain([0, callers.length - 1])
+    .range(['#410078', '#FBA6FC']);
+
 var color = d3.scale.ordinal()
     .domain(d3.range(1, callers.length + 1).reverse())
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    .range(d3.range(0, callers.length).map(colorScale));
 
 var xAxis = d3.svg.axis()
     .scale(x)
@@ -103,9 +119,11 @@ data.forEach(function(d) {
   d.total = d.counts[d.counts.length - 1].y1;
 });
 
-// data.sort(function(a, b) { return b.total - a.total; });
-
-x.domain(data.map(function(d) { return d[0]; }));
+// Create some additional space between "Union" and the individual callers by
+// adding an empty x category.
+var augmentedLabels = data.map(function(d) { return d[0]; });
+augmentedLabels.splice(augmentedLabels.length - 1, 0, "");
+x.domain(augmentedLabels);
 y.domain([0, d3.max(data, function(d) { return d.total; })]);
 
 svg.append("g")
@@ -113,12 +131,13 @@ svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis);
 
-svg.append("g")
+var yAxisGroup = svg.append("g")
     .attr("class", "y axis")
-    .call(yAxis)
-  .append("text")
+    .call(yAxis);
+yAxisGroup.append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 6)
+    .attr("x", -height + 113)
     .attr("dy", ".71em")
     .style("text-anchor", "end")
     .text("Number of Variant Calls");
@@ -137,24 +156,52 @@ bars.selectAll("rect")
     .attr("height", function(d) { return y(d.y0) - y(d.y1); })
     .style("fill", function(d) { return color(d.name); });
 
-var legend = svg.selectAll(".legend")
+// data labels
+bars.selectAll("text")
+    .data(function(d) { return [d]; })
+  .enter().append("text")
+    .attr('y', function(d) { return y(d.total); })
+    .attr('dy', '-0.35em')
+    .attr('dx', x.rangeBand() / 2)
+    .attr('style', 'text-anchor: middle')
+    .text(function(d) { return d3.format("n")(d.total); });
+
+var legend = yAxisGroup.selectAll(".legend")
     .data(color.domain().slice().reverse())
   .enter().append("g")
     .attr("class", "legend")
     .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
 legend.append("rect")
-    .attr("x", width - 10)
+    .attr("x", 30)
     .attr("width", 18)
     .attr("height", 18)
     .style("fill", color);
 
+var humanizeInteger = d3.scale.ordinal()
+                              .domain(d3.range(0, 10))
+                              .range(["zero", "one", "two", "three",
+                                      "four", "five", "six", "seven",
+                                      "eight", "nine", "ten"]);
+
 legend.append("text")
-    .attr("x", width - 16)
+    .attr("x", 30 + 18 + 6)
     .attr("y", 9)
     .attr("dy", ".35em")
-    .style("text-anchor", "end")
-    .text(function(d) { return d; });
-
+    .style("text-anchor", "start")
+    .style("fill", color)
+    .text(function(d) {
+        var callerStr = "";
+        if (d === 1) {
+            callerStr = "a single caller";
+        } else if (d === callers.length) {
+            callerStr = "all callers";
+        } else if (d < 10) {
+            callerStr = humanizeInteger(d) + " callers";
+        } else {
+            callerStr = d + " callers";
+        }
+        return "Detected by " + callerStr;
+    });
 
 </script>
