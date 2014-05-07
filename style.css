@@ -1,0 +1,27 @@
+body {
+  font: 10px sans-serif;
+}
+
+rect {
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+  stroke: black;
+}
+
+.legend rect {
+  stroke: none;
+}
+
+.legend text {
+  font-size: 1.4em;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path, .x.axis line {
+  display: none;
+}
