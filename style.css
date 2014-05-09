@@ -8,12 +8,17 @@ rect {
   stroke: black;
 }
 
+.bar text {
+    text-anchor: middle;
+}
+
 .legend rect {
   stroke: none;
 }
 
 .legend text {
   font-size: 1.4em;
+  text-anchor: start;
 }
 
 .axis path, .axis line {
@@ -24,4 +29,10 @@ rect {
 
 .x.axis path, .x.axis line {
   display: none;
+}
+
+#title {
+    font-weight: 700;
+    font-size: 15px;
+    text-anchor: middle;
 }

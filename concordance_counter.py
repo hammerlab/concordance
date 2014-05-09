@@ -1,5 +1,6 @@
 # coding: utf-8
 import collections
+import functools as ft
 import json
 import os
 import sys
@@ -11,44 +12,11 @@ import vcf
 # c.f. https://github.com/jamescasbon/PyVCF/issues/153
 PASS = []
 
-
-def record_key(record):
-    return record.CHROM + "-" + str(record.POS)
-
-
-def variants_to_caller_mapper(vcf_dict):
-    """Return a mapping from passing variants (identified by CHROM-POS) in the
-    provided VCFs to a set of the names of the VCFs in which the variants were
-    called.
-
-    e.g. {'2-5712387': {'mutect', 'varscan'}, ...}
-
-    vcf_dct -- mapping of VCF names to vcf.Reader instances of the VCF,
-               from open_vcfs (e.g. {'vcfname': vcf.Reader, ...}).
-    """
-    mapping = collections.defaultdict(set)
-    for vcf_name, records in vcf_dict.iteritems():
-        for record in records:
-            if record.FILTER == PASS:
-                # Should we also check genotype of normal/tumor?
-                mapping[record_key(record)].add(vcf_name)
-    return mapping
+DP_BINS = [(1, 5), (6, 10), (11, 20), (21, 30), (31, 100)]
+FA_BINS = [(0.0, 0.2), (0.2, 0.4), (0.4, 0.6), (0.6, 0.8), (0.8, 1.0)]
 
 
-def count_vcf_concordance(mapping):
-    """Return a mapping from comma-separated strings of VCF names to the number
-    of concordances found in that, and only that, set of VCFs.
-
-    e.g. {'vcf1,vcf2': 123124, 'vcf1': 10012, 'vcf2': 201}
-
-    mapping -- mapping of variants to the set of VCFs in which those variants
-               are found, from variants_to_caller_mapper.
-    """
-    concordance_counts = collections.defaultdict(int)
-    for vcfs in mapping.itervalues():
-        concordance_counts[','.join(vcfs)] += 1
-    return concordance_counts
-
+### Utility ###
 
 def base_name(path):
     return os.path.splitext(os.path.basename(path))[0]
@@ -59,15 +27,114 @@ def open_vcfs(vcfs):
             for vcf_file in vcfs}
 
 
-def main(args):
-    readers = open_vcfs(args)
-    mapping = variants_to_caller_mapper(readers)
-    concordance_counts = count_vcf_concordance(mapping)
+def inclusive_between(tr, num):
+    return tr[0] <= num <= tr[1]
 
-    print "var data = "    + json.dumps(concordance_counts) + ";"
-    print "var callers = " + json.dumps(readers.keys())     + ";"
+
+def bin_on(val_fn, bins, items):
+    """Return a mapping of bin to items in that bin, as determined by the value
+    of the val_fn applied to the item. Bins are inclusive. Bin keys are
+    converted to strings.
+    """
+    bin_to_item = collections.defaultdict(list)
+    for item in items:
+        for bin in bins:
+            if inclusive_between(bin, val_fn(item)):
+                bin_to_item[str(bin)].append(item)
+            else: bin_to_item[str(bin)] # Ensure all bins are in the map.
+    return bin_to_item
+
+
+### VCF-specific ###
+
+def record_key(record):
+    return record.CHROM + "-" + str(record.POS)
+
+
+def _get_sample_data_attr(attr, sample_name, record, default=None):
+    """Return the value of the attribute for the given sample of a record.
+    Applies `tr` to the value before returning it if given.
+    """
+    indices = record._sample_indexes
+    sample_index = indices[sample_name] if sample_name in indices else None
+    if sample_index:
+        data = record.samples[sample_index].data
+        return getattr(data, attr)
+    else:
+        return default
+
+
+def bin_variants_by_DP_and_FA(variants, sample_name, DP_bins=DP_BINS, FA_bins=FA_BINS):
+    """Sequence of VCF records ->
+    {read_depth_bin1: {af_range_1: [record1, ..], ..}, ..} for a given sample.
+    """
+    _get_dp = ft.partial(_get_sample_data_attr, 'DP', sample_name)
+    _get_fa = ft.partial(_get_sample_data_attr, 'FA', sample_name)
+
+    depth_bins = bin_on(_get_dp, DP_bins, variants)
+    for dp_bin, records in depth_bins.iteritems():
+        depth_bins[dp_bin] = bin_on(_get_fa, FA_bins, records)
+        for fa_bin, records in depth_bins[dp_bin].iteritems():
+            depth_bins[dp_bin][fa_bin] = len(set(records))
+    return depth_bins
+
+
+def variants_to_caller_mapper(vcfname_to_records_dict):
+    """Return a mapping from passing variants (identified by CHROM-POS) in the
+    provided VCFs to a set of the names of the VCFs in which the variants were
+    called.
+
+    e.g. {'2-5712387': {'mutect', 'varscan'}, ...}
+
+    vcf_dct -- mapping of VCF names to vcf.Reader instances of the VCF,
+               from open_vcfs (e.g. {'vcfname': vcf.Reader, ...}).
+    """
+    mapping = collections.defaultdict(set)
+    for vcf_name, records in vcfname_to_records_dict.iteritems():
+        for record in records:
+            if record.FILTER == PASS:
+                # Should we also check genotype of normal/tumor?
+                mapping[record_key(record)].add(vcf_name)
+    return mapping
+
+
+def vcf_to_concordance(variants_to_vcfs_dict):
+    """Returns a mapping from each VCF caller to a mapping of the number of
+    VCFs in concordance to the number of calls they concord on.
+    """
+    concordance_counts = collections.defaultdict(lambda: collections.defaultdict(int))
+    for vcfs in variants_to_vcfs_dict.itervalues():
+        for vcf in vcfs:
+            concordance_counts[vcf][len(vcfs)] += 1
+    return concordance_counts
+
+
+def main(sample_name, args):
+    vcf_readers = open_vcfs(args)
+    vcf_names = vcf_readers.keys()
+
+    passing_records = {} # Look at only calls that PASS the filters.
+    for vcf, records in vcf_readers.iteritems():
+        # Important to reify the generator, as we'll be reusing it.
+        passing_records[vcf] = [r for r in records if r.FILTER == PASS]
+
+    variants_to_callers = variants_to_caller_mapper(passing_records)
+    concordance_counts = vcf_to_concordance(variants_to_callers)
+
+    DP_FA_binning = {}
+    for vcf, records in passing_records.iteritems():
+        DP_FA_binning[vcf] = bin_variants_by_DP_and_FA(records, sample_name)
+    print "var dpfaBinning = " + json.dumps(DP_FA_binning, indent=4) + ";"
+
+    print "var concordanceCounts = " + json.dumps(concordance_counts, indent=4) + ";"
+    print "var callers = " + json.dumps(vcf_names) + ";"
+
 
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    if len(sys.argv) < 3:
+        print "Usage:"
+        print "SAMPLE.NAME VCF*"
+        print
+    main(sys.argv[1], sys.argv[2:])
