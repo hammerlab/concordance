@@ -48,7 +48,8 @@ def bin_on(val_fn, bins, items):
 ### VCF-specific ###
 
 def record_key(record):
-    return record.CHROM + "-" + str(record.POS)
+    return (record.CHROM + "-" + str(record.POS) + ':' +
+            record.REF + "->" + str(record.ALT))
 
 
 def _get_sample_data_attr(attr, sample_name, record, default=None):
@@ -71,9 +72,9 @@ def bin_variants_by_DP_and_FA(variants, sample_name, DP_bins=DP_BINS, FA_bins=FA
     _get_dp = ft.partial(_get_sample_data_attr, 'DP', sample_name)
     _get_fa = ft.partial(_get_sample_data_attr, 'FA', sample_name)
 
-    depth_bins = bin_on(_get_dp, DP_bins, variants)
+    depth_bins = bin_on(_get_dp, DP_BINS, variants)
     for dp_bin, records in depth_bins.iteritems():
-        depth_bins[dp_bin] = bin_on(_get_fa, FA_bins, records)
+        depth_bins[dp_bin] = bin_on(_get_fa, FA_BINS, records)
         for fa_bin, records in depth_bins[dp_bin].iteritems():
             depth_bins[dp_bin][fa_bin] = len(set(records))
     return depth_bins
@@ -92,9 +93,7 @@ def variants_to_caller_mapper(vcfname_to_records_dict):
     mapping = collections.defaultdict(set)
     for vcf_name, records in vcfname_to_records_dict.iteritems():
         for record in records:
-            if record.FILTER == PASS:
-                # Should we also check genotype of normal/tumor?
-                mapping[record_key(record)].add(vcf_name)
+            mapping[record_key(record)].add(vcf_name)
     return mapping
 
 
@@ -116,10 +115,10 @@ def main(sample_name, args):
     passing_records = {} # Look at only calls that PASS the filters.
     for vcf, records in vcf_readers.iteritems():
         # Important to reify the generator, as we'll be reusing it.
-        passing_records[vcf] = [r for r in records if r.FILTER == PASS]
+        passing_records[vcf] = [r for r in records if r.FILTER == PASS or not r.FILTER]
 
     variants_to_callers = variants_to_caller_mapper(passing_records)
-    concordance_counts = vcf_to_concordance(variants_to_callers)
+    concordance_counts  = vcf_to_concordance(variants_to_callers)
 
     DP_FA_binning = {}
     for vcf, records in passing_records.iteritems():

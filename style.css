@@ -17,7 +17,7 @@ rect {
 }
 
 .legend text {
-  font-size: 1.4em;
+  font-size: 1.1em;
   text-anchor: start;
 }
 
@@ -35,4 +35,8 @@ rect {
     font-weight: 700;
     font-size: 15px;
     text-anchor: middle;
+}
+
+.fa-chart {
+    display: inline-block;
 }

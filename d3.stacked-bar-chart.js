@@ -25,10 +25,13 @@ function d3_stackedBars() {
     // be specified with barName and sectionName).
     //
 
+    // TODO(ihodes): name section{Value,Name} better
+    // TODO(ihodes): get sorting of legend/colors fixes/specifiable
+    // TODO(ihodes): scale legend with size of graph (including font...?)
     var margin = {top: 40, right: 200, bottom: 50, left: 40},
         width  = 960,
         height = 500,
-        barName = function(d)  { return d.name; }, // Get the x value of the bar.
+        barName = function(d)  { return d.name; },       // Get the x value of the bar.
         sectionValue  = function(d) { return d.value; }, // Get the value of a section.
         sectionName = function(d) { return d.name; },    // Get the name of a section.
         xScale = d3.scale.ordinal(),
@@ -72,7 +75,7 @@ function d3_stackedBars() {
                 }),
                 sectionNames = uniq(data.reduce(function(a,v){
                     return a.concat(v.map(sectionName));
-                }, [])),
+                }, [])).sort().reverse(), // TODO(ihodes) allow this to be specified...
                 maxBarTotal = d3.max(data, function(d) {
                     return sum(d.map(function(i) {
                         return sectionValue(i);
@@ -164,13 +167,13 @@ function d3_stackedBars() {
                                    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
             legend.append("rect")
-                  .attr("x", width + margin.left - 66)
+                  .attr("x", width + margin.left - 23)
                   .attr("width", 18)
                   .attr("height", 18)
                   .style("fill", color);
 
             legend.append("text")
-                  .attr("x", width + margin.left + 6 + 18 - 66)
+                  .attr("x", width + margin.left + 6 + 18 - 23)
                   .attr("y", 9)
                   .attr("dy", ".35em")
                   .style("fill", color)
@@ -189,8 +192,8 @@ function d3_stackedBars() {
 
     chart.width = function(_) {
         if (!arguments.length) return width;
-        margin = _;
-        return width;
+        width = _;
+        return chart;
     };
 
     chart.height = function(_) {
