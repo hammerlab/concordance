@@ -1,0 +1,14 @@
+{
+  "name": "concordance",
+  "version": "0.1.1",
+  "description": "Visualization of concordance between variant callers",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danvk/concordance.git"
+  },
+  "dependencies": {
+    "d3": ">=3",
+    "assert": "*",
+    "underscore": "*"
+  }
+}

@@ -53,3 +53,5 @@ coverage.xml
 docs/_build/
 
 data/
+
+node_modules
