@@ -9,6 +9,7 @@
   "dependencies": {
     "d3": ">=3",
     "assert": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "jquery": ">=2.0.0"
   }
 }
