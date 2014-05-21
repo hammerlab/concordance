@@ -1,21 +1,21 @@
 var assert = require("assert"),
-    jsdom = require("jsdom").jsdom,
-    _ = require("underscore");
+    _ = require("underscore"),
+    jquery = require("jquery"),
+    d3sandbox = require("./d3sandbox");
 
-// TODO(danvk): figure out if it's possible to use Node's require() here.
-// TODO(danvk): wrap this up in a test helper module.
-var document = jsdom('<html><head>' + 
-    '<script src="../node_modules/d3/d3.min.js"></script>' + 
-    '<script src="../node_modules/underscore/underscore-min.js"></script>' + 
-    '<script src="../d3.stacked-bar-chart.js"></script>' + 
-    '</head><body></body></html>');
-
-var window = document.parentWindow;
-var $ = require("jquery")(window);
 
 describe('d3.stacked-bar-chart', function() {
+  var $, document, d3;
+
+  beforeEach(function() {
+    var sandbox = d3sandbox.create();
+    $ = jquery(sandbox.window);
+    d3 = sandbox.d3;
+    document = sandbox.document;
+  });
+
   it('should have the right defaults', function() {
-    var chart = window.d3.chart.stackedBars();
+    var chart = d3.chart.stackedBars();
     assert.equal(960, chart.width());
     assert.equal(500, chart.height());
   });
@@ -31,7 +31,7 @@ describe('d3.stacked-bar-chart', function() {
     data[2].name = 'somaticsniper.chr20';
 
     var sum = function(list) { return list.reduce(function(a,b){return a + b;}, 0); };
-    var chart = window.d3.chart.stackedBars()
+    var chart = d3.chart.stackedBars()
         .title("Caller Concordance")
         .yAxisTitle("Number of Variants Called")
         .sectionBinDesc("callers in concordance")
@@ -48,7 +48,7 @@ describe('d3.stacked-bar-chart', function() {
     var div = document.createElement('div');
     div.setAttribute('id', 'conc_div');
     document.body.appendChild(div);
-    window.d3.select('#conc_div').datum(data).call(chart);
+    d3.select('#conc_div').datum(data).call(chart);
 
     var sumTexts = $.makeArray($('g.bar text', div)).map(function(x) { return $(x).text()});
     assert.deepEqual(["1,527", "1,653", "1,680"], sumTexts);
