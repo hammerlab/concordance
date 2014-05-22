@@ -137,7 +137,6 @@ def main(sample_name, truth, args):
     print "var scores = " + json.dumps(scores) + ";"
 
 
-
 if __name__ == '__main__':
     if len(sys.argv) < 4:
         print "Usage:"
