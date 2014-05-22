@@ -3,7 +3,7 @@ _.sum = function(list) { return list.reduce(function(a,b){return a + b;}, 0); };
 // Raw data is in the form `{bar1: {stack1: val, stack2: val, ..}, .. }`, need
 // to transform into array of bars (arrays) of sections (objects with value &
 // name).
-var mutect_fa = _.map(dpfaBinning["mutect.chr20"], function(sectionMap, barName) {
+var mutect_fa = _.map(dpfaBinning["mutect"], function(sectionMap, barName) {
     var sections = _.map(_.keys(sectionMap), function(name) {
         return {name: name, value: sectionMap[name]};
     });
@@ -11,7 +11,7 @@ var mutect_fa = _.map(dpfaBinning["mutect.chr20"], function(sectionMap, barName)
     return sections;
 });
 
-var somatic_sniper_fa = _.map(dpfaBinning["somaticsniper.chr20"], function(sectionMap, barName) {
+var somatic_sniper_fa = _.map(dpfaBinning["somaticsniper"], function(sectionMap, barName) {
     var sections = _.map(_.keys(sectionMap), function(name) {
         return {name: name, value: sectionMap[name]};
     });
@@ -84,3 +84,6 @@ d3.select("#fa2")
 d3.select("#conc").style("margin-top", "47px")
   .datum(conc_data)
   .call(conc_chart);
+
+
+displayScores(scores);

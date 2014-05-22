@@ -1,12 +1,12 @@
 var dpfaBinning = {
-    "trn.truth.chr20": {
+    "truth": {
         "(31, 100)": {},
         "(1, 5)": {},
         "(11, 20)": {},
         "(21, 30)": {},
         "(6, 10)": {}
     },
-    "somaticsniper.chr20": {
+    "somaticsniper": {
         "(31, 100)": {
             "(0.6, 0.8)": 10,
             "(0.8, 1.0)": 88,
@@ -43,7 +43,7 @@ var dpfaBinning = {
             "(0.2, 0.4)": 2
         }
     },
-    "mutect.chr20": {
+    "mutect": {
         "(31, 100)": {
             "(0.6, 0.8)": 4,
             "(0.8, 1.0)": 46,
@@ -82,20 +82,22 @@ var dpfaBinning = {
     }
 };
 var concordanceCounts = {
-    "somaticsniper.chr20": {
+    "somaticsniper": {
         "1": 155,
         "2": 200,
         "3": 1325
     },
-    "truth.chr20": {
+    "truth": {
         "1": 104,
         "2": 98,
         "3": 1325
     },
-    "mutect.chr20": {
+    "mutect": {
         "1": 68,
         "2": 260,
         "3": 1325
     }
 };
-var callers = ["trn.truth.chr20", "trn.somaticsniper.20140508.chr20.vcf.derivedFA.out", "trn.mutect.20140505.chr20"];
+var scores = {"mutect": {"recall": 0.9716262975778547, "f1score": 0.97061873487729, "precision": 0.9696132596685083},
+              "truth": {"recall": 1.0, "f1score": 1.0, "precision": 1.0},
+              "somaticsniper": {"recall": 0.9301038062283737, "f1score": 0.9428270782181691, "precision": 0.9559032716927454}};

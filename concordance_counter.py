@@ -6,6 +6,7 @@ import os
 import sys
 import vcf
 
+import evaluator
 
 
 # In PyVCF, a [] for FILTER means the filter was PASS.
@@ -108,9 +109,16 @@ def vcf_to_concordance(variants_to_vcfs_dict):
     return concordance_counts
 
 
-def main(sample_name, args):
-    vcf_readers = open_vcfs(args)
+def main(sample_name, truth, args):
+    vcf_files = args
+    vcf_files.append(truth)
+
+    vcf_readers = open_vcfs(vcf_files)
     vcf_names = vcf_readers.keys()
+
+    scores = {}
+    for vcf_file in vcf_files:
+        scores[vcf_file] = evaluator.evaluate(vcf_file, truth+".gz")
 
     passing_records = {} # Look at only calls that PASS the filters.
     for vcf, records in vcf_readers.iteritems():
@@ -126,14 +134,13 @@ def main(sample_name, args):
     print "var dpfaBinning = " + json.dumps(DP_FA_binning, indent=4) + ";"
 
     print "var concordanceCounts = " + json.dumps(concordance_counts, indent=4) + ";"
-    print "var callers = " + json.dumps(vcf_names) + ";"
-
+    print "var scores = " + json.dumps(scores) + ";"
 
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         print "Usage:"
-        print "SAMPLE.NAME VCF*"
+        print "SAMPLE.NAME <truth.vcf> VCF*"
         print
-    main(sys.argv[1], sys.argv[2:])
+    main(sys.argv[1], sys.argv[2], sys.argv[3:])
