@@ -145,9 +145,9 @@ function d3_stackedBars() {
             if (showBarTotals) {
                 bars.selectAll("text")
                     .data(function(d) { return [d]; })
-                    .enter().append("text")
+                   .enter().append("text")
                     .attr('y', function(d) { return yScale(d.total); })
-                    .attr('dy', '-0.35em')
+                    .attr('dy', '-0.45em')
                     .attr('dx', xScale.rangeBand() / 2)
                     .text(function(d) { return d3.format("n")(d.total); });
             }
@@ -176,7 +176,6 @@ function d3_stackedBars() {
                   .attr("x", width + margin.left + 6 + 18 - 23)
                   .attr("y", 9)
                   .attr("dy", ".35em")
-                  .style("fill", color)
                   .text(function(d) {
                       return d + " " + legendText + ".";
                   });
