@@ -5,7 +5,6 @@
  * @param {Object.<string, Object.<string, number>>} scores An Object mapping
  *        callers to scores, which are mappings from score type to score.
  */
-
 function displayScores(scores) {
   var data = [];
   var scoreNames = ['f1score', 'recall', 'precision'];
@@ -13,9 +12,9 @@ function displayScores(scores) {
   // the_score, type: the_score_type}
   for (var name in scores) {
     var score = scores[name];
-    for (var i in scoreNames) {
-      var scoreName = scoreNames[i]
-      data.push({name: name, value: score[scoreName], type: scoreName})
+    for (var type in scoreNames) {
+      var scoreName = scoreNames[type];
+      data.push({name: name, value: score[scoreName], type: scoreName});
     }
   }
 
@@ -73,7 +72,7 @@ function displayScores(scores) {
     .data(data)
    .enter().append("g")
     .attr("class", "part")
-    .attr("transform", function(d) { return "translate(" + (x1(d.name) + x0(d.type)) + ",0)"; })
+    .attr("transform", function(d) { return "translate(" + (x1(d.name) + x0(d.type)) + ",0)"; });
 
   var bars = parts.selectAll(".bar")
     .data(function(d) { return [d]; })
