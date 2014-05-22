@@ -157,7 +157,7 @@ var concordanceCounts = {
         "4": 172,
         "5": 1252
     },
-    "somaticsniper": {
+    "somatic-sniper": {
         "1": 123,
         "2": 23,
         "3": 40,
@@ -186,8 +186,6 @@ var concordanceCounts = {
         "5": 1252
     }
 };
-var callerNames = ['mutect', 'somatic-sniper', 'strelka', 'varscan'];
+var scores = {"mutect": {"recall": 0.9716262975778547, "f1score": 0.97061873487729, "precision": 0.9696132596685083}, "varscan": {"recall": 0.9737024221453288, "f1score": 0.9493927125506073, "precision": 0.9262672811059908}, "strelka": {"recall": 0.8726643598615917, "f1score": 0.9299410029498526, "precision": 0.9952644041041832}, "truth": {"recall": 1.0, "f1score": 1.0, "precision": 1.0}, "somatic-sniper": {"recall": 0.9301038062283737, "f1score": 0.9428270782181691, "precision": 0.9559032716927454}};
 
-var scores = {"mutect": {"recall": 0.9716262975778547, "f1score": 0.97061873487729, "precision": 0.9696132596685083},
-              "truth": {"recall": 1.0, "f1score": 1.0, "precision": 1.0},
-              "somaticsniper": {"recall": 0.9301038062283737, "f1score": 0.9428270782181691, "precision": 0.9559032716927454}};
+var callerNames = ["strelka", "somatic-sniper", "truth", "varscan", "mutect"];

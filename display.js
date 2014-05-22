@@ -3,19 +3,19 @@
 ///////////////
 
 function reverseStringTupleComparator(a,b) {
-    a = a.replace(/\(|\)|\s/g, "").split(",").map(function(v){return parseFloat(v);});
-    b = b.replace(/\(|\)|\s/g, "").split(",").map(function(v){return parseFloat(v);});
-    if (a.length !== b.length)  throw TypeError("Tuples must be of the same length.");
-    for (var i in a) {
-        if (a[i] === b[i]) {
-            continue;
-        } else if (a[i] > b[i]) { // a > b
-            return 1;
-        } else { // b > a
-            return -1;
-        }
+  a = a.replace(/\(|\)|\s/g, "").split(",").map(parseFloat);
+  b = b.replace(/\(|\)|\s/g, "").split(",").map(parseFloat);
+  if (a.length !== b.length)  throw TypeError("Tuples must be of the same length.");
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] === b[i]) {
+      continue;
+    } else if (a[i] > b[i]) { // a > b
+      return 1;
+    } else { // b > a
+      return -1;
     }
-    return 0; // a == b
+  }
+  return 0; // a == b
 }
 _.sum = function(list) { return list.reduce(function(a,b){return a + b;}, 0); };
 

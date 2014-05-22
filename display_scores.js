@@ -88,8 +88,8 @@ function displayScores(scores) {
     .attr('class', 'score-text')
     .attr('transform', 'rotate(90)')
     .attr('x', function(d) { return y(d.value) + 10; })
-    .attr('dy', '-1.1em')
-    .text(function(d) { return d3.format(".2f")(d.value); });
+    .attr('dy', '-0.79em')
+    .text(function(d) { return d3.format(".3f")(d.value); });
 
   var legend = svg.selectAll(".legend")
     .data(callerNames.slice().reverse())

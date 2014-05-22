@@ -1,3 +1,8 @@
+"""Add the FA (Frequency of Allelle) field to a VCF file, deriving it from the
+   existing information in the VCF file.
+
+   Supports SomaticSniper, VarScan, Mutect, Strelka VCFs.
+"""
 import os
 import sys
 
@@ -16,19 +21,14 @@ def deriver_for(caller):
     Caller must be one of 'strelka', 'somaticsniper', 'virmid', 'varscan',
     'mutect'.
     """
-    caller = caller.lower()
-
-    if caller == 'strelka':
-        return _derive_strelka_fa
-    elif caller == 'somaticsniper':
-        return _derive_somaticsniper_fa
-    elif caller == 'varscan':
-        return _derive_varscan_fa
-    elif caller == 'mutect': # MuTect outputs FA
-        return lambda x: x
-    elif caller == 'virmid':
-        return _derive_virmid_da
-    else:
+    callers = {'strelka': _derive_strelka_fa,
+               'somaticsniper': _derive_somaticsniper_fa,
+               'varscan': _derive_varscan_fa,
+               'mutect': lambda x: x,
+               'virmid': lambda x: x}
+    try:
+        return callers[caller.lower()]
+    except KeyError:
         sys.stderr.write('ERROR: caller "' + caller + '" is not recognized.')
         sys.exit(1)
 
@@ -40,8 +40,6 @@ def _derive_varscan_fa(record):
         add_format_field(record, 'FA')
         freq_string = sample.data.FREQ
         frequency_of_allele = float(freq_string[:-1]) / 100
-        if frequency_of_allele in (0, 1):
-            frequency_of_allele = int(frequency_of_allele)
         add_field(record, sample.sample, 'FA', frequency_of_allele)
     return record
 
@@ -58,8 +56,6 @@ def _derive_strelka_fa(record):
                   for alt in alts if alt != 'None'}
         alts_total = sum(counts[allele] for allele in alts if allele != 'None')
         frequency_of_allele = round(float(alts_total) / read_depth, 3)
-        if frequency_of_allele in (0, 1):
-            frequency_of_allele = int(frequency_of_allele)
         add_field(record, sample.sample, 'FA', frequency_of_allele)
     return record
 
@@ -76,8 +72,6 @@ def _derive_somaticsniper_fa(record):
                          for idx, count in enumerate(bcounts)}
         alts_total = sum(allele_counts[allele] for allele in alts)
         frequency_of_allele = round(float(alts_total) / read_depth, 3)
-        if frequency_of_allele in (0, 1):
-            frequency_of_allele = int(frequency_of_allele)
         add_field(record, sample.sample, 'FA', frequency_of_allele)
     return record
 
@@ -122,7 +116,7 @@ if __name__ == '__main__':
         records = vcf.Reader(vcf_in)
         records.formats['FA'] = FA_FORMAT
 
-        with open(basename+'.derivedFA.vcf', 'w') as output:
+        with open(basename + '.derivedFA.vcf', 'w') as output:
             writer = vcf.Writer(output, records)
             for record in records:
                 writer.write_record(deriver(record))
