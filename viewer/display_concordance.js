@@ -96,5 +96,3 @@ var concordance_chart = d3.chart.stackedBars()
 d3.select("#conc").style("margin-top", "47px")
   .datum(concordance_data)
   .call(concordance_chart);
-
-displayScores(scores);

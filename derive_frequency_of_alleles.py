@@ -1,8 +1,10 @@
-"""Add the FA (Frequency of Allelle) field to a VCF file, deriving it from the
-   existing information in the VCF file.
+"""Add the FA (Frequency of Allelle) field to a VCF file.
 
-   Supports SomaticSniper, VarScan, Mutect, Strelka VCFs.
+This field is derived from other existing information in the VCF file.
+
+Supports SomaticSniper, VarScan, Mutect, Strelka VCFs.
 """
+
 import os
 import sys
 
