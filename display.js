@@ -1,9 +1,50 @@
+  ///////////////
+ // Utilities //
+///////////////
+
+function reverseStringTupleComparator(a,b) {
+  a = a.replace(/\(|\)|\s/g, "").split(",").map(parseFloat);
+  b = b.replace(/\(|\)|\s/g, "").split(",").map(parseFloat);
+  if (a.length !== b.length)  throw TypeError("Tuples must be of the same length.");
+  for (var i = 0; i < a.length; i++) {
+    if (a[i] === b[i]) {
+      continue;
+    } else if (a[i] > b[i]) { // a > b
+      return 1;
+    } else { // b > a
+      return -1;
+    }
+  }
+  return 0; // a == b
+}
 _.sum = function(list) { return list.reduce(function(a,b){return a + b;}, 0); };
+
+
+
+  ////////////////////
+ //       ETL      //
+////////////////////
+
+// We have globals concordanceCounts, dpfaBinner, and callerNames from output.js
 
 // Raw data is in the form `{bar1: {stack1: val, stack2: val, ..}, .. }`, need
 // to transform into array of bars (arrays) of sections (objects with value &
 // name).
-var mutect_fa = _.map(dpfaBinning["mutect"], function(sectionMap, barName) {
+
+// Munge the FA data.
+var FA_data = {};
+callerNames.forEach(function(name) {
+  var data = _.map(dpfaBinning[name], function(sectionMap, barName) {
+    var sections = _.map(_.keys(sectionMap), function(name) {
+      return {name: name, value: sectionMap[name]};
+    });
+    sections.name = barName;
+    return sections;
+  });
+  FA_data[name] = data;
+});
+
+var concordance_data = _.map(concordanceCounts, function(sectionMap, barName) {
     var sections = _.map(_.keys(sectionMap), function(name) {
         return {name: name, value: sectionMap[name]};
     });
@@ -11,37 +52,11 @@ var mutect_fa = _.map(dpfaBinning["mutect"], function(sectionMap, barName) {
     return sections;
 });
 
-var somatic_sniper_fa = _.map(dpfaBinning["somaticsniper"], function(sectionMap, barName) {
-    var sections = _.map(_.keys(sectionMap), function(name) {
-        return {name: name, value: sectionMap[name]};
-    });
-    sections.name = barName;
-    return sections;
-});
 
-var conc_data = _.map(concordanceCounts, function(sectionMap, barName) {
-    var sections = _.map(_.keys(sectionMap), function(name) {
-        return {name: name, value: sectionMap[name]};
-    });
-    sections.name = barName;
-    return sections;
-});
 
-function reverseStringTupleComparator(a,b) {
-    a = a.replace(/\(|\)|\s/g, "").split(",").map(function(v){return parseFloat(v);});
-    b = b.replace(/\(|\)|\s/g, "").split(",").map(function(v){return parseFloat(v);});
-    if (a.length !== b.length)  throw TypeError("Tuples must be of the same length.");
-    for (var i in a) {
-        if (a[i] === b[i]) {
-            continue;
-        } else if (a[i] > b[i]) { // a > b
-            return 1;
-        } else { // b > a
-            return -1;
-        }
-    }
-    return 0; // a == b
-}
+  ////////////////////
+ // Visualizations //
+////////////////////
 
 var fa_chart = d3.chart.stackedBars()
     .xAxisTitle("Read Depth Range")
@@ -57,8 +72,14 @@ var fa_chart = d3.chart.stackedBars()
         return reverseStringTupleComparator(a.name, b.name);
     });
 
+// Display the FA charts.
+callerNames.forEach(function(name) {
+  d3.select("#"+name)
+    .datum(FA_data[name])
+    .call(fa_chart.title(name));
+});
 
-var conc_chart = d3.chart.stackedBars()
+var concordance_chart = d3.chart.stackedBars()
     .title("Caller Concordance")
     .yAxisTitle("Number of Variants Called")
     .sectionBinDesc("callers in concordance")
@@ -72,18 +93,8 @@ var conc_chart = d3.chart.stackedBars()
         return totalA - totalB;
     });
 
-
-d3.select("#fa1")
-  .datum(somatic_sniper_fa)
-  .call(fa_chart.title("Somatic Sniper"));
-
-d3.select("#fa2")
-  .datum(mutect_fa)
-  .call(fa_chart.title("MuTect"));
-
 d3.select("#conc").style("margin-top", "47px")
-  .datum(conc_data)
-  .call(conc_chart);
-
+  .datum(concordance_data)
+  .call(concordance_chart);
 
 displayScores(scores);

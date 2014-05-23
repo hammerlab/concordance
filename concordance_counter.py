@@ -135,7 +135,7 @@ def main(sample_name, truth, args):
 
     print "var concordanceCounts = " + json.dumps(concordance_counts, indent=4) + ";"
     print "var scores = " + json.dumps(scores) + ";"
-
+    print "var callerNames = " + json.dumps(vcf_names) + ";"
 
 
 if __name__ == '__main__':
