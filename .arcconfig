@@ -1,0 +1,4 @@
+{
+  "project.name" : "conc",
+  "phabricator.uri" : "http://phabricator.example.com/"
+}
