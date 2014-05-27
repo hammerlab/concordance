@@ -3,7 +3,7 @@
 
 Outputs the resulting data as JavaScript on stdout.
 """
-
+import argparse
 import collections
 import functools as ft
 import json
@@ -30,8 +30,8 @@ def base_name(path):
 
 
 def open_vcfs(vcfs):
-    return {base_name(vcf_file): vcf.Reader(open(vcf_file))
-            for vcf_file in vcfs}
+    return {name: vcf.Reader(open(filename))
+            for name, filename in vcfs.iteritems()}
 
 
 def inclusive_between(tr, num):
@@ -118,20 +118,20 @@ def vcf_to_concordance(variants_to_vcfs_dict):
     return concordance_counts
 
 
-def main(sample_name, truth, vcf_files):
-    vcf_files.append(truth)
-
-    vcf_readers = open_vcfs(vcf_files)
-    vcf_names = vcf_readers.keys()
-
+def main(sample_name, truth, vcfs, output):
     scores = {}
-    for vcf_file in vcf_files:
-        scores[vcf_file] = dream_evaluator.evaluate(vcf_file, truth+".gz")
+    for vcf, vcf_file in vcfs.iteritems():
+        scores[vcf] = dream_evaluator.evaluate(vcf_file, truth + ".gz")
+
+    vcfs['truth'] = truth
+    vcf_readers = open_vcfs(vcfs)
+    vcf_names = vcf_readers.keys()
 
     passing_records = {}  # Look at only calls that PASS the filters.
     for vcf, records in vcf_readers.iteritems():
         # Important to reify the generator, as we'll be reusing it.
-        passing_records[vcf] = [r for r in records if r.FILTER == PASS or not r.FILTER]
+        passing_records[vcf] = [r for r in records
+                                if r.FILTER == PASS or not r.FILTER]
 
     variants_to_callers = variants_to_caller_mapper(passing_records)
     concordance_counts  = vcf_to_concordance(variants_to_callers)
@@ -139,15 +139,37 @@ def main(sample_name, truth, vcf_files):
     DP_FA_binning = {}
     for vcf, records in passing_records.iteritems():
         DP_FA_binning[vcf] = bin_variants_by_DP_and_FA(records, sample_name)
-    print "var dpfaBinning = " + json.dumps(DP_FA_binning, indent=4) + ";"
 
-    print "var concordanceCounts = " + json.dumps(concordance_counts, indent=4) + ";"
-    print "var scores = " + json.dumps(scores) + ";"
-    print "var callerNames = " + json.dumps(vcf_names) + ";"
+    output.write(("var dpfaBinning = " + json.dumps(DP_FA_binning, indent=4) + ";\n"
+                  "var concordanceCounts = " + json.dumps(concordance_counts, indent=4) + ";\n"
+                  "var scores = " + json.dumps(scores, indent=4) + ";\n"
+                  "var callerNames = " + json.dumps(vcf_names) + ";\n"))
+
+
+class KeyValueAction(argparse.Action):
+    """Action which splits key=value arguments into a dict."""
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = [value.split('=') for value in values]
+        if not all(len(val) == 2 for val in values):
+            parser.error(("values for " + self.dest +
+                          " must be in key=value format\n"))
+        setattr(namespace, self.dest, {val[0]: val[1] for val in values})
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 4:
-        sys.stderr.write("Usage:\n")
-        sys.stderr.write("%s SAMPLE.NAME <truth.vcf> VCF*\n" % sys.argv[0])
-    main(sys.argv[1], sys.argv[2], sys.argv[3:])
+    parser = argparse.ArgumentParser(description=("output concordance, scoring,"
+                                                  " and sensitivity data of VCF"
+                                                  "files"))
+    parser.add_argument('-o', '--output', default=sys.stdout, metavar='output',
+                        type=argparse.FileType('w'),
+                        help="designate output file (otherwise stdout)")
+    parser.add_argument('sample_name', metavar='sample-name',
+                        help="common sample name in VCFs to compare")
+    parser.add_argument('truth', metavar='truth.vcf',
+                        help=("ground truth VCF with which to "
+                              "compare other VCFs against."))
+    parser.add_argument('vcfs', metavar='vcfname=file.vcf',
+                        nargs='+', action=KeyValueAction,
+                        help="VCF files to compare to each other")
+    args = parser.parse_args()
+    main(args.sample_name, args.truth, args.vcfs, args.output)
