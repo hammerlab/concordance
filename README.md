@@ -1,5 +1,4 @@
-concordance
-===========
+# Concordance
 
 Visualize concordance and other quality metrics between variant callers.
 
@@ -8,7 +7,18 @@ Usage:
     python concordance_counter.py sample.name *.vcf > viewer/concordance-data.js
     open viewer/concordance.html
 
-Example:
+## Setting up
+
+We use [virtualenv](https://pypi.python.org/pypi/virtualenv) for dependency management.
+
+To get started, run:
+
+    virtualenv env                   # make a new virtualenv named 'env'.
+    source env/bin/activate          # activate the env (local pip, python).
+    pip install -r requirements.txt  # install the requirements in the env.
+
+## Examples
+
 
 ![](http://link.isaachodes.io/image/3v362B0g1t3B/Screen%20Shot%202014-05-22%20at%204.57.29%20PM.png)
 

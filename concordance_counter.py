@@ -9,6 +9,7 @@ import functools as ft
 import json
 import os
 import sys
+
 import vcf
 
 import dream_evaluator
