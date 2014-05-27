@@ -10,7 +10,7 @@ var vm = require("vm"),
 var js_files = [
   "node_modules/d3/d3.min.js",
   "node_modules/underscore/underscore-min.js",
-  "d3.stacked-bar-chart.js"
+  "viewer/d3.stacked-bar-chart.js"
 ];
 
 var concatenatedJs = js_files.map(function(path) {

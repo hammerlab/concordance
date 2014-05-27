@@ -45,11 +45,11 @@ callerNames.forEach(function(name) {
 });
 
 var concordance_data = _.map(concordanceCounts, function(sectionMap, barName) {
-    var sections = _.map(_.keys(sectionMap), function(name) {
-        return {name: name, value: sectionMap[name]};
-    });
-    sections.name = barName;
-    return sections;
+  var sections = _.map(_.keys(sectionMap), function(name) {
+    return {name: name, value: sectionMap[name]};
+  });
+  sections.name = barName;
+  return sections;
 });
 
 
@@ -65,18 +65,18 @@ var fa_chart = d3.chart.stackedBars()
     .showBarTotals(false)
     .width(200)
     .height(150)
-    .barComparator(function(a,b) {
-        return reverseStringTupleComparator(a.name, b.name);
+    .barComparator(function(a, b) {
+      return reverseStringTupleComparator(a.name, b.name);
     })
-    .sectionComparator(function(a,b) {
-        return reverseStringTupleComparator(a.name, b.name);
+    .sectionComparator(function(a, b) {
+      return reverseStringTupleComparator(a.name, b.name);
     });
 
 // Display the FA charts.
 callerNames.forEach(function(name) {
-  d3.select("#"+name)
-    .datum(FA_data[name])
-    .call(fa_chart.title(name));
+  d3.select("#" + name)
+      .datum(FA_data[name])
+      .call(fa_chart.title(name));
 });
 
 var concordance_chart = d3.chart.stackedBars()
@@ -85,16 +85,16 @@ var concordance_chart = d3.chart.stackedBars()
     .sectionBinDesc("callers in concordance")
     .stackColors(['#410078', '#FBA6FC'])
     .sectionComparator(function(a,b) {
-       return parseInt(b.name) > parseInt(a.name);
+      return parseInt(b.name) > parseInt(a.name);
     })
     .barComparator(function(a, b) {
-        var totalA = _.sum(a.map(function(s){ return s.value; }));
-        var totalB = _.sum(b.map(function(s){ return s.value; }));
-        return totalA - totalB;
+      var totalA = _.sum(a.map(function(s){ return s.value; }));
+      var totalB = _.sum(b.map(function(s){ return s.value; }));
+      return totalA - totalB;
     });
 
 d3.select("#conc").style("margin-top", "47px")
-  .datum(concordance_data)
-  .call(concordance_chart);
+    .datum(concordance_data)
+    .call(concordance_chart);
 
-displayScores(scores);
+displayScores(document.getElementById("prec-recall"), scores);

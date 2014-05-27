@@ -1,4 +1,9 @@
 # coding: utf-8
+"""Script to compare VCF files to each other and to truth data.
+
+Outputs the resulting data as JavaScript on stdout.
+"""
+
 import collections
 import functools as ft
 import json
@@ -6,7 +11,7 @@ import os
 import sys
 import vcf
 
-import evaluator
+import dream_evaluator
 
 
 # In PyVCF, a [] for FILTER means the filter was PASS.
@@ -33,7 +38,9 @@ def inclusive_between(tr, num):
 
 
 def bin_on(val_fn, bins, items):
-    """Return a mapping of bin to items in that bin, as determined by the value
+    """Group items into a pre-determined set of bins.
+
+    Return a mapping of bin to items in that bin, as determined by the value
     of the val_fn applied to the item. Bins are inclusive. Bin keys are
     converted to strings.
     """
@@ -42,7 +49,8 @@ def bin_on(val_fn, bins, items):
         for bin in bins:
             if inclusive_between(bin, val_fn(item)):
                 bin_to_item[str(bin)].append(item)
-            else: bin_to_item[str(bin)] # Ensure all bins are in the map.
+            else:
+                bin_to_item[str(bin)] # Ensure all bins are in the map.
     return bin_to_item
 
 
@@ -109,8 +117,7 @@ def vcf_to_concordance(variants_to_vcfs_dict):
     return concordance_counts
 
 
-def main(sample_name, truth, args):
-    vcf_files = args
+def main(sample_name, truth, vcf_files):
     vcf_files.append(truth)
 
     vcf_readers = open_vcfs(vcf_files)
@@ -118,9 +125,9 @@ def main(sample_name, truth, args):
 
     scores = {}
     for vcf_file in vcf_files:
-        scores[vcf_file] = evaluator.evaluate(vcf_file, truth+".gz")
+        scores[vcf_file] = dream_evaluator.evaluate(vcf_file, truth+".gz")
 
-    passing_records = {} # Look at only calls that PASS the filters.
+    passing_records = {}  # Look at only calls that PASS the filters.
     for vcf, records in vcf_readers.iteritems():
         # Important to reify the generator, as we'll be reusing it.
         passing_records[vcf] = [r for r in records if r.FILTER == PASS or not r.FILTER]
@@ -140,7 +147,6 @@ def main(sample_name, truth, args):
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
-        print "Usage:"
-        print "SAMPLE.NAME <truth.vcf> VCF*"
-        print
+        sys.stderr.write("Usage:\n")
+        sys.stderr.write("%s SAMPLE.NAME <truth.vcf> VCF*\n" % sys.argv[0])
     main(sys.argv[1], sys.argv[2], sys.argv[3:])
