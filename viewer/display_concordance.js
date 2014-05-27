@@ -65,18 +65,18 @@ var fa_chart = d3.chart.stackedBars()
     .showBarTotals(false)
     .width(200)
     .height(150)
-    .barComparator(function(a,b) {
+    .barComparator(function(a, b) {
         return reverseStringTupleComparator(a.name, b.name);
     })
-    .sectionComparator(function(a,b) {
+    .sectionComparator(function(a, b) {
         return reverseStringTupleComparator(a.name, b.name);
     });
 
 // Display the FA charts.
 callerNames.forEach(function(name) {
-  d3.select("#"+name)
-    .datum(FA_data[name])
-    .call(fa_chart.title(name));
+  d3.select("#" + name)
+      .datum(FA_data[name])
+      .call(fa_chart.title(name));
 });
 
 var concordance_chart = d3.chart.stackedBars()
@@ -94,5 +94,5 @@ var concordance_chart = d3.chart.stackedBars()
     });
 
 d3.select("#conc").style("margin-top", "47px")
-  .datum(concordance_data)
-  .call(concordance_chart);
+    .datum(concordance_data)
+    .call(concordance_chart);

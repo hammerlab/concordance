@@ -99,53 +99,53 @@ function d3_stackedBars() {
                 .range(d3.range(0, sectionNames.length).map(colorScale));
 
             var svg = d3.select(this).append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
-                      .append("g")
-                        .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
             var bars = svg.selectAll(".bar")
-                          .data(data)
-                        .enter().append("g")
-                          .attr("class", "bar")
-                          .attr("transform", function(d) { return "translate(" + xScale(barName(d)) + ", 0)"; });
+                .data(data)
+              .enter().append("g")
+                .attr("class", "bar")
+                .attr("transform", function(d) { return "translate(" + xScale(barName(d)) + ", 0)"; });
 
             var sections = bars.selectAll(".bar")
-                               .data(function(d){return d;})
-                             .enter().append("rect")
-                               .attr("width", xScale.rangeBand())
-                               .attr("y", function(d) { return yScale(d.y1); })
-                               .attr("height", function(d) { return yScale(d.y0) - yScale(d.y1); })
-                               .style("fill", function(d) { return color(d.name); });
+                .data(function(d){return d;})
+              .enter().append("rect")
+                .attr("width", xScale.rangeBand())
+                .attr("y", function(d) { return yScale(d.y1); })
+                .attr("height", function(d) { return yScale(d.y0) - yScale(d.y1); })
+                .style("fill", function(d) { return color(d.name); });
 
             var xAxisGroup = svg.append("g")
-                                .attr("class", "x axis")
-                                .attr("transform", "translate(0, " + height + ")")
-                                .call(xAxis);
+                .attr("class", "x axis")
+                .attr("transform", "translate(0, " + height + ")")
+                .call(xAxis);
 
             xAxisGroup.append("text")
-                      .attr("y", 33)
-                      .attr("x", width/2)
-                      .attr("dy", ".71em")
-                      .style("text-anchor", "middle")
-                      .text(xAxisTitle);
+                .attr("y", 33)
+                .attr("x", width/2)
+                .attr("dy", ".71em")
+                .style("text-anchor", "middle")
+                .text(xAxisTitle);
 
             var yAxisGroup = svg.append("g")
-                                .attr("class", "y axis")
-                                .call(yAxis);
+                .attr("class", "y axis")
+                .call(yAxis);
 
             yAxisGroup.append("text")
-                      .attr("transform", "rotate(-90)")
-                      .attr("y", 6)
-                      .attr("x", -height/2)
-                      .attr("dy", ".71em")
-                      .style("text-anchor", "middle")
-                      .text(yAxisTitle);
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("x", -height/2)
+                .attr("dy", ".71em")
+                .style("text-anchor", "middle")
+                .text(yAxisTitle);
 
             if (showBarTotals) {
                 bars.selectAll("text")
                     .data(function(d) { return [d]; })
-                   .enter().append("text")
+                  .enter().append("text")
                     .attr('y', function(d) { return yScale(d.total); })
                     .attr('dy', '-0.45em')
                     .attr('dx', xScale.rangeBand() / 2)
@@ -161,24 +161,24 @@ function d3_stackedBars() {
 
             // Legend
             var legend = yAxisGroup.selectAll(".legend")
-                                   .data(color.domain().slice().reverse())
-                                 .enter().append("g")
-                                   .attr("class", "legend")
-                                   .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+                  .data(color.domain().slice().reverse())
+                .enter().append("g")
+                  .attr("class", "legend")
+                  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
             legend.append("rect")
-                  .attr("x", width + margin.left - 23)
-                  .attr("width", 18)
-                  .attr("height", 18)
-                  .style("fill", color);
+                .attr("x", width + margin.left - 23)
+                .attr("width", 18)
+                .attr("height", 18)
+                .style("fill", color);
 
             legend.append("text")
-                  .attr("x", width + margin.left + 6 + 18 - 23)
-                  .attr("y", 9)
-                  .attr("dy", ".35em")
-                  .text(function(d) {
-                      return d + " " + legendText + ".";
-                  });
+                .attr("x", width + margin.left + 6 + 18 - 23)
+                .attr("y", 9)
+                .attr("dy", ".35em")
+                .text(function(d) {
+                    return d + " " + legendText + ".";
+                });
         });
     }
 

@@ -24,28 +24,28 @@ function displayScores(el, scores) {
       height = 400 - margin.top - margin.bottom;
 
   var x0 = d3.scale.ordinal()
-    .rangeRoundBands([0, width], .1);
+      .rangeRoundBands([0, width], .1);
 
   var x1 = d3.scale.ordinal();
 
   var y = d3.scale.linear()
-    .domain([0.75, 1])
-    .range([height, 0]);
+      .domain([0.75, 1])
+      .range([height, 0]);
 
   var color = d3.scale.ordinal()
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
   var xAxis = d3.svg.axis()
-    .scale(x0)
-    .orient("bottom");
+      .scale(x0)
+      .orient("bottom");
 
   var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left");
+      .scale(y)
+      .orient("left");
 
   var svg = d3.select(el).append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -55,13 +55,13 @@ function displayScores(el, scores) {
   x1.domain(callerNames).rangeRoundBands([0, x0.rangeBand()], 0, 2);
 
   svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis);
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
 
   svg.append("g")
-    .attr("class", "y axis")
-    .call(yAxis)
+      .attr("class", "y axis")
+      .call(yAxis)
     .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
@@ -70,13 +70,13 @@ function displayScores(el, scores) {
       .text("Score");
 
   var parts = svg.selectAll(".part")
-    .data(data)
+      .data(data)
     .enter().append("g")
       .attr("class", "part")
       .attr("transform", function(d) { return "translate(" + (x1(d.name) + x0(d.type)) + ",0)"; });
 
   var bars = parts.selectAll(".bar")
-    .data(function(d) { return [d]; })
+      .data(function(d) { return [d]; })
     .enter().append("rect")
       .attr('width', x1.rangeBand())
       .attr('y', function(d) { return y(d.value); })
@@ -93,23 +93,23 @@ function displayScores(el, scores) {
       .text(function(d) { return d3.format(".3f")(d.value); });
 
   var legend = svg.selectAll(".legend")
-    .data(callerNames.slice().reverse())
+      .data(callerNames.slice().reverse())
     .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   legend.append("rect")
-    .attr("x", width + 60)
-    .attr("width", 18)
-    .attr("height", 18)
-    .style("fill", color);
+      .attr("x", width + 60)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
 
   legend.append("text")
-    .attr("x", width + 55)
-    .attr("y", 9)
-    .attr("dy", ".35em")
-    .style("text-anchor", "end")
-    .text(function(d) { return d; });
+      .attr("x", width + 55)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
 }
 
 displayScores(document.getElementById("prec-recall"), scores);
