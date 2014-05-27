@@ -147,20 +147,20 @@ def main(sample_name, truth, vcfs, output):
 
 
 class KeyValueAction(argparse.Action):
-     def __call__(self, parser, namespace, values, option_string=None):
-         values = [value.split('=') for value in values]
-         if not all((len(val) == 2 for val in values)):
-             sys.stderr.write(("values for " + self.dest +
-                               " must be in key=value format\n"))
-             sys.exit(2)
-         setattr(namespace, self.dest, {val[0]: val[1] for val in values})
+    """Action which splits key=value arguments into a dict."""
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = [value.split('=') for value in values]
+        if not all(len(val) == 2 for val in values):
+            parser.error(("values for " + self.dest +
+                          " must be in key=value format\n"))
+        setattr(namespace, self.dest, {val[0]: val[1] for val in values})
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=("output concordance, scoring,"
                                                   " and sensitivity data of VCF"
                                                   "files"))
-    parser.add_argument('-o', '--output', default=sys.stdout,
+    parser.add_argument('-o', '--output', default=sys.stdout, metavar='output',
                         type=argparse.FileType('w'),
                         help="designate output file (otherwise stdout)")
     parser.add_argument('sample_name', metavar='sample-name',
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     parser.add_argument('truth', metavar='truth.vcf',
                         help=("ground truth VCF with which to "
                               "compare other VCFs against."))
-    parser.add_argument('vcfs', metavar='name1=vcf1, name2=vcf2, ...',
+    parser.add_argument('vcfs', metavar='vcfname=file.vcf',
                         nargs='+', action=KeyValueAction,
                         help="VCF files to compare to each other")
     args = parser.parse_args()

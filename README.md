@@ -5,8 +5,10 @@ Visualize concordance and other quality metrics between variant callers.
 
 Usage:
 
-    python concordance_counter.py sample.name *.vcf > viewer/concordance-data.js
-    open viewer/concordance.html
+    concordance_counter.py [-h] [-o output] sample-name truth.vcf
+                           vcfname=file.vcf [vcfname=file.vcf ...]
+
+    open concordance.html
 
 Example:
 
