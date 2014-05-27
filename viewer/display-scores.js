@@ -111,5 +111,3 @@ function displayScores(el, scores) {
       .style("text-anchor", "end")
       .text(function(d) { return d; });
 }
-
-displayScores(document.getElementById("prec-recall"), scores);
