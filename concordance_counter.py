@@ -1,6 +1,7 @@
 """Script to compare VCF files to each other and to truth data.
 
-Outputs the resulting data as JavaScript on stdout."""
+Outputs the resulting data as JavaScript on stdout.
+"""
 
 # coding: utf-8
 import collections
@@ -37,7 +38,9 @@ def inclusive_between(tr, num):
 
 
 def bin_on(val_fn, bins, items):
-    """Return a mapping of bin to items in that bin, as determined by the value
+    """Group items into a pre-determined set of bins.
+
+    Return a mapping of bin to items in that bin, as determined by the value
     of the val_fn applied to the item. Bins are inclusive. Bin keys are
     converted to strings.
     """
@@ -46,7 +49,8 @@ def bin_on(val_fn, bins, items):
         for bin in bins:
             if inclusive_between(bin, val_fn(item)):
                 bin_to_item[str(bin)].append(item)
-            else: bin_to_item[str(bin)] # Ensure all bins are in the map.
+            else:
+                bin_to_item[str(bin)] # Ensure all bins are in the map.
     return bin_to_item
 
 

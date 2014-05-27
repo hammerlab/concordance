@@ -2,11 +2,11 @@
  * Display a barchart of scores, grouped by score type (e.g. precision, recall)
  * and colored by variant caller.
  *
- * @param {!HTMLElement} div Element in which to display the score chart.
+ * @param {!HTMLElement} el Element in which to display the score chart.
  * @param {Object.<string, Object.<string, number>>} scores An Object mapping
  *        callers to scores, which are mappings from score type to score.
  */
-function displayScores(div, scores) {
+function displayScores(el, scores) {
   var data = [];
   var scoreNames = ['f1score', 'recall', 'precision'];
   // Data will be a list of objects like {name: variant_caller_name, value:
@@ -43,7 +43,7 @@ function displayScores(div, scores) {
     .scale(y)
     .orient("left");
 
-  var svg = d3.select(div).append("svg")
+  var svg = d3.select(el).append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
