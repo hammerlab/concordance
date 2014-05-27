@@ -1,9 +1,9 @@
+# coding: utf-8
 """Script to compare VCF files to each other and to truth data.
 
 Outputs the resulting data as JavaScript on stdout.
 """
 
-# coding: utf-8
 import collections
 import functools as ft
 import json
