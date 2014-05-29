@@ -33,32 +33,32 @@ def main(args):
 
     r = random.Random()
     print '''Sources:
-A: %s
-B: %s
+A: %(sourceA)s
+B: %(sourceB)s
 
 Counts:
-A: %d
-B: %d
-A`B: %d
-B`A: %d
-A^B: %d
-A+B: %d
+A: %(countA)d
+B: %(countB)d
+A`B: %(countAminusB)d
+B`A: %(countBminusA)d
+A^B: %(countAintB)d
+A+B: %(countAunionB)d
 
 Pairwise samples:
-A`B: %s
-B`A: %s
-A^B: %s
-''' % (args[0],
-       args[1],
-       len(a),
-       len(b),
-       len(a - b),
-       len(b - a),
-       len(a.intersection(b)),
-       len(a.union(b)),
-       ', '.join(r.sample(a - b, 10)),
-       ', '.join(r.sample(b - a, 10)),
-       ', '.join(r.sample(a.intersection(b), 10)))
+A`B: %(sampleAminusB)s
+B`A: %(sampleBminusA)s
+A^B: %(sampleAintB)s
+''' % {'sourceA': args[0],
+       'sourceB': args[1],
+       'countA': len(a),
+       'countB': len(b),
+       'countAminusB': len(a - b),
+       'countBminusA': len(b - a),
+       'countAintB': len(a.intersection(b)),
+       'countAunionB': len(a.union(b)),
+       'sampleAminusB': ', '.join(r.sample(a - b, 10)),
+       'sampleBminusA': ', '.join(r.sample(b - a, 10)),
+       'sampleAintB': ', '.join(r.sample(a.intersection(b), 10))}
 
 
 if __name__ == '__main__':
