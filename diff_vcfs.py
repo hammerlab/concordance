@@ -6,8 +6,9 @@ Usage:
 """
 
 import sys
-import vcf
 import random
+
+import vcf
 
 
 # In PyVCF, a [] for FILTER means the filter was PASS.
@@ -27,11 +28,9 @@ def main(args):
     assert len(args) == 2
     vcfs = [vcf.Reader(open(path)) for path in args]
 
-    calls = [set([call_key(call) for call in reader if is_ok(call)])
-             for reader in vcfs]
+    a, b = [{call_key(call) for call in reader if is_ok(call)}
+            for reader in vcfs]
 
-    a = calls[0]
-    b = calls[1]
     r = random.Random()
     print '''Sources:
 A: %s
