@@ -120,7 +120,9 @@ def vcf_to_concordance(variants_to_vcfs_dict):
 
 
 def main(sample_name, truth, vcfs, output):
-    assert truth.endswith('.gz'), 'Truth data must be gzipped'
+    if not truth.endswith('.gz'):
+      sys.stderr.write('Truth data must be gzipped, got %s\n' % truth)
+      sys.exit(2)
 
     scores = {}
     for vcf, vcf_file in vcfs.iteritems():
