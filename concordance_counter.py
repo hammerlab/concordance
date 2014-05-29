@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # coding: utf-8
 """Script to compare VCF files to each other and to truth data.
 
@@ -119,9 +120,11 @@ def vcf_to_concordance(variants_to_vcfs_dict):
 
 
 def main(sample_name, truth, vcfs, output):
+    assert truth.endswith('.gz'), 'Truth data must be gzipped'
+
     scores = {}
     for vcf, vcf_file in vcfs.iteritems():
-        scores[vcf] = dream_evaluator.evaluate(vcf_file, truth + ".gz")
+        scores[vcf] = dream_evaluator.evaluate(vcf_file, truth)
 
     vcfs['truth'] = truth
     vcf_readers = open_vcfs(vcfs)
