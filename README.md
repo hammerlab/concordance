@@ -9,6 +9,15 @@ Usage:
 
     open concordance.html
 
+For example, to reproduce the sample data included in the repo, run:
+
+    concordance_counter.py tumor.chr20 sampledata/trn.truth.chr20.vcf.gz \
+    somatic-sniper=sampledata/trn.somaticsniper.20140508.chr20.derivedFA.vcf \
+    mutect=sampledata/trn.mutect.20140505.chr20.vcf \
+    strelka=sampledata/trn.strelka.20140508.chr.20.derivedFA.vcf \
+    varscan=sampledata/trn.varscan.05142014.chr20.hc.derivedFA.vcf \
+    > viewer/concordance-data.js
+
 ## Setting up
 
 We use [virtualenv](https://pypi.python.org/pypi/virtualenv) for dependency management.
