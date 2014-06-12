@@ -11,5 +11,8 @@
     "assert": "*",
     "underscore": "*",
     "jquery": ">=2.0.0"
+  },
+  "devDependencies": {
+    "qunitjs": "^1.14.0"
   }
 }
