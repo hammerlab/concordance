@@ -1,4 +1,4 @@
-(function(){
+(function() {
 
   function sum(arr) {
     return arr.reduce(function(a, v){ return a + v; }, 0);
