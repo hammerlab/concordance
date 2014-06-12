@@ -12,5 +12,13 @@
   "es5": false,
   "esnext": false,
   "globalstrict": false,
-  "lastsemic": false
+  "lastsemic": false,
+  "browser": true,
+  "globals": {
+    "d3": true,
+    "_": true,
+    "$": true,
+    "QUnit": true
+  },
+  "maxerr": 100000
 }

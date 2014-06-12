@@ -8,7 +8,7 @@
  */
 function displayScores(el, scores) {
   var data = [];
-  var scoreNames = ['f1score', 'recall', 'precision'];
+  var scoreNames = ["f1score", "recall", "precision"];
   // Data will be a list of objects like {name: variant_caller_name, value:
   // the_score, type: the_score_type}
   for (var name in scores) {
@@ -33,7 +33,8 @@ function displayScores(el, scores) {
       .range([height, 0]);
 
   var color = d3.scale.ordinal()
-      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c",
+              "#ff8c00"]);
 
   var xAxis = d3.svg.axis()
       .scale(x0)
@@ -73,30 +74,34 @@ function displayScores(el, scores) {
       .data(data)
     .enter().append("g")
       .attr("class", "part")
-      .attr("transform", function(d) { return "translate(" + (x1(d.name) + x0(d.type)) + ",0)"; });
+      .attr("transform", function(d) {
+        return "translate(" + (x1(d.name) + x0(d.type)) + ",0)";
+      });
 
   var bars = parts.selectAll(".bar")
       .data(function(d) { return [d]; })
     .enter().append("rect")
-      .attr('width', x1.rangeBand())
-      .attr('y', function(d) { return y(d.value); })
-      .attr('height', function(d) { return height - y(d.value); })
-      .style('fill', function(d) { return color(d.name); });
+      .attr("width", x1.rangeBand())
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .style("fill", function(d) { return color(d.name); });
 
   parts.selectAll("text")
     .data(function(d) { return [d]; })
     .enter().append("text")
-      .attr('class', 'score-text')
-      .attr('transform', 'rotate(90)')
-      .attr('x', function(d) { return y(d.value) + 10; })
-      .attr('dy', '-0.79em')
+      .attr("class", "score-text")
+      .attr("transform", "rotate(90)")
+      .attr("x", function(d) { return y(d.value) + 10; })
+      .attr("dy", "-0.79em")
       .text(function(d) { return d3.format(".3f")(d.value); });
 
   var legend = svg.selectAll(".legend")
       .data(callerNames.slice().reverse())
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      .attr("transform", function(d, i) {
+        return "translate(0," + i * 20 + ")";
+      });
 
   legend.append("rect")
       .attr("x", width + 60)

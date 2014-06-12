@@ -16,11 +16,11 @@
     "qunitjs": "^1.14.0",
     "grunt-cli": "0.1.6",
     "grunt": "0.4.0",
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-qunit": "~0.1.1",
+    "grunt-contrib-jshint": "~0.7.2",
+    "grunt-contrib-qunit": "~0.5.1",
     "grunt-qunit-junit": "~0.1.0",
-    "grunt-contrib-watch": "~0.2.0",
-    "grunt-qunit-cov": "~0.3.2"
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-qunit-cov": "~0.3.6"
   },
   "scripts": {
     "test": "grunt travis"

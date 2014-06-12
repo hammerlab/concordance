@@ -2,25 +2,27 @@
 module.exports = function (grunt) {
   'use strict';
 
-  var gruntConfig = {};
-  grunt.loadNpmTasks('grunt-contrib-qunit');
-  gruntConfig.qunit = {
-    src: ['test/index.html']
-  };
-
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  gruntConfig.jshint = {
-    options: {
-      jshintrc: '.jshintrc'
+  grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+    qunit: {
+      src: ['test/index.html']
     },
-    allFiles: [
-      'Gruntfile.js',
-      'viewer/**/*.js',
-      'test/**/*.js'
-    ]
-  };
+    jshint: {
+      all: [
+        'Gruntfile.js',
+        'viewer/**/*.js',
+        'test/**/*.js'
+      ],
+      options: {
+        jshintrc: '.jshintrc',
+        ignores: ['viewer/concordance-data.js'],
+      }
+    }
+  });
+
+  grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
   grunt.registerTask('test', 'qunit:src');
   grunt.registerTask('travis', ['lint', 'test']);
-  grunt.initConfig(gruntConfig);
 };
