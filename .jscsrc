@@ -1,0 +1,8 @@
+{
+  "preset": "google",
+  "validateIndentation": 2,
+  "requireCurlyBraces": ["else", "for", "while", "do", "try", "catch"],
+  "excludeFiles": [
+    "viewer/concordance-data.js"
+  ]
+}

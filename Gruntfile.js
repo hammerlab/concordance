@@ -1,6 +1,13 @@
 /*global module*/
-module.exports = function (grunt) {
+module.exports = function(grunt) {
   'use strict';
+
+  var jsSources = [
+    'Gruntfile.js',
+    'viewer/**/*.js',
+    'test/**/*.js',
+    '!viewer/concordance-data.js'
+  ];
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -8,21 +15,21 @@ module.exports = function (grunt) {
       src: ['test/index.html']
     },
     jshint: {
-      all: [
-        'Gruntfile.js',
-        'viewer/**/*.js',
-        'test/**/*.js'
-      ],
+      all: jsSources,
       options: {
         jshintrc: '.jshintrc',
         ignores: ['viewer/concordance-data.js'],
       }
+    },
+    jscs: {
+      src: jsSources
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-jscs-checker');
 
   grunt.registerTask('test', 'qunit:src');
-  grunt.registerTask('travis', ['lint', 'test']);
+  grunt.registerTask('travis', ['test', 'jshint', 'jscs']);
 };

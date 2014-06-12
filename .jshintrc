@@ -6,7 +6,6 @@
   "noarg": true,
   "sub": true,
   "undef": true,
-  "quotmark": true,
   "trailing": true,
   "maxlen": 80,
   "es5": false,
