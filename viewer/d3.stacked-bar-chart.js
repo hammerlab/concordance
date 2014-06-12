@@ -55,7 +55,7 @@ function d3_stackedBars() {
 
     function chart(selection) {
         selection.each(function(data) {
-            var data = data.sort(barSorter).map(function(s) {
+                data.sort(barSorter).map(function(s) {
                     return s.sort(stackSorter);
                 }),
                 // Calculate how the bars should be stacked:
@@ -84,7 +84,7 @@ function d3_stackedBars() {
 
             xScale
                 .domain(barNames)
-                .rangeRoundBands([0, width], .5);
+                .rangeRoundBands([0, width], 0.5);
 
             yScale
                 .domain([0, maxBarTotal])
@@ -259,13 +259,13 @@ function d3_stackedBars() {
         if (!arguments.length) return sectionName;
         sectionName = _;
         return chart;
-    }
+    };
 
     chart.barName = function(_) {
         if (!arguments.length) return barName;
         barName = _;
         return chart;
-    }
+    };
 
     return chart;
 }

@@ -85,7 +85,7 @@ var concordance_chart = d3.chart.stackedBars()
     .sectionBinDesc("callers in concordance")
     .stackColors(['#410078', '#FBA6FC'])
     .sectionComparator(function(a,b) {
-      return parseInt(b.name) > parseInt(a.name);
+      return parseInt(b.name, 10) > parseInt(a.name, 10);
     })
     .barComparator(function(a, b) {
       var totalA = _.sum(a.map(function(s){ return s.value; }));

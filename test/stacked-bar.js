@@ -26,7 +26,7 @@ QUnit.test('d3.stacked-bar-chart should be minimally functional', function(asser
       .sectionBinDesc("callers in concordance")
       .stackColors(['#410078', '#FBA6FC'])
       .sectionComparator(function(a,b) {
-         return parseInt(b.name) > parseInt(a.name);
+         return parseInt(b.name, 10) > parseInt(a.name, 10);
       })
       .barComparator(function(a, b) {
           var totalA = sum(a.map(function(s){ return s.value; }));
@@ -39,7 +39,7 @@ QUnit.test('d3.stacked-bar-chart should be minimally functional', function(asser
   document.body.appendChild(div);
   d3.select('#conc_div').datum(data).call(chart);
 
-  var sumTexts = $.makeArray($('g.bar text', div)).map(function(x) { return $(x).text()});
+  var sumTexts = $.makeArray($('g.bar text', div)).map(function(x) { return $(x).text();});
   assert.deepEqual(["1,527", "1,653", "1,680"], sumTexts);
 
   // TODO: add more thorough assertions here.
