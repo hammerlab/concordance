@@ -6,6 +6,7 @@ QUnit.test('d3.stacked-bar-chart should have the right defaults', function(asser
   var chart = d3.chart.stackedBars();
   assert.equal(960, chart.width());
   assert.equal(500, chart.height());
+  assert.ok( 1 == "1" );
 });
 
 QUnit.test('d3.stacked-bar-chart should be minimally functional', function(assert) {
