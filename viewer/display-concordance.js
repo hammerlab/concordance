@@ -27,7 +27,7 @@ _.sum = function(list) {
  //       ETL      //
 ////////////////////
 
-/* global concordanceCounts: true, dpfaBinning: true, callerNames: true */
+/* global concordanceCounts: false, dpfaBinning: false, callerNames: false */
 // We have globals concordanceCounts, dpfaBinning, and callerNames from
 // concordance-data.js.
 

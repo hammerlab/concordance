@@ -18,7 +18,7 @@ module.exports = function(grunt) {
       all: jsSources,
       options: {
         jshintrc: '.jshintrc',
-        ignores: ['viewer/concordance-data.js'],
+        ignores: ['viewer/concordance-data.js']
       }
     },
     jscs: {
