@@ -3,9 +3,11 @@
 ///////////////
 
 function reverseStringTupleComparator(a,b) {
-  a = a.replace(/\(|\)|\s/g, "").split(",").map(parseFloat);
-  b = b.replace(/\(|\)|\s/g, "").split(",").map(parseFloat);
-  if (a.length !== b.length)  throw TypeError("Tuples must be of the same length.");
+  a = a.replace(/\(|\)|\s/g, '').split(',').map(parseFloat);
+  b = b.replace(/\(|\)|\s/g, '').split(',').map(parseFloat);
+  if (a.length !== b.length) {
+    throw new TypeError('Tuples must be of the same length.');
+  }
   for (var i = 0; i < a.length; i++) {
     if (a[i] === b[i]) {
       continue;
@@ -17,15 +19,17 @@ function reverseStringTupleComparator(a,b) {
   }
   return 0; // a == b
 }
-_.sum = function(list) { return list.reduce(function(a,b){return a + b;}, 0); };
-
-
+_.sum = function(list) {
+  return list.reduce(function(a, b) { return a + b; }, 0);
+};
 
   ////////////////////
  //       ETL      //
 ////////////////////
 
-// We have globals concordanceCounts, dpfaBinner, and callerNames from output.js
+/* global concordanceCounts: true, dpfaBinning: true, callerNames: true */
+// We have globals concordanceCounts, dpfaBinning, and callerNames from
+// concordance-data.js.
 
 // Raw data is in the form `{bar1: {stack1: val, stack2: val, ..}, .. }`, need
 // to transform into array of bars (arrays) of sections (objects with value &
@@ -52,16 +56,14 @@ var concordance_data = _.map(concordanceCounts, function(sectionMap, barName) {
   return sections;
 });
 
-
-
   ////////////////////
  // Visualizations //
 ////////////////////
 
 var fa_chart = d3.chart.stackedBars()
-    .xAxisTitle("Read Depth Range")
-    .yAxisTitle("Number of Variants Called")
-    .sectionBinDesc("frequency of allele")
+    .xAxisTitle('Read Depth Range')
+    .yAxisTitle('Number of Variants Called')
+    .sectionBinDesc('frequency of allele')
     .showBarTotals(false)
     .width(200)
     .height(150)
@@ -74,27 +76,29 @@ var fa_chart = d3.chart.stackedBars()
 
 // Display the FA charts.
 callerNames.forEach(function(name) {
-  d3.select("#" + name)
+  d3.select('#' + name)
       .datum(FA_data[name])
       .call(fa_chart.title(name));
 });
 
 var concordance_chart = d3.chart.stackedBars()
-    .title("Caller Concordance")
-    .yAxisTitle("Number of Variants Called")
-    .sectionBinDesc("callers in concordance")
+    .title('Caller Concordance')
+    .yAxisTitle('Number of Variants Called')
+    .sectionBinDesc('callers in concordance')
     .stackColors(['#410078', '#FBA6FC'])
     .sectionComparator(function(a,b) {
       return parseInt(b.name, 10) > parseInt(a.name, 10);
     })
     .barComparator(function(a, b) {
-      var totalA = _.sum(a.map(function(s){ return s.value; }));
-      var totalB = _.sum(b.map(function(s){ return s.value; }));
+      var totalA = _.sum(a.map(function(s) { return s.value; }));
+      var totalB = _.sum(b.map(function(s) { return s.value; }));
       return totalA - totalB;
     });
 
-d3.select("#conc").style("margin-top", "47px")
+d3.select('#conc').style('margin-top', '47px')
     .datum(concordance_data)
     .call(concordance_chart);
 
-displayScores(document.getElementById("prec-recall"), scores);
+// Defined in display-scores.js and concordance-data.js
+/* global displayScores: true, scores: true */
+displayScores(document.getElementById('prec-recall'), scores);
