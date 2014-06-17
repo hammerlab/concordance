@@ -22,8 +22,10 @@ casper.test.begin('Concordance example', 1, function(test) {
 
   // compare the screenshot against a known baseline
   casper.then(function() {
+
+    var absPath = fs.absolute('pdiff-tests/golden/concordance.png');
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'file:///Users/danvk/github/concordance/pdiff-tests/golden/concordance.png', false);
+    xhr.open('GET', 'file://' + absPath, false);
     xhr.responseType = 'arraybuffer';
     xhr.onload = function(e) {
       var data64 = base64.base64ArrayBuffer(e.currentTarget.response);
@@ -42,14 +44,15 @@ casper.test.begin('Concordance example', 1, function(test) {
   }, function then() {
     if (results.misMatchPercentage != "0.00") {
       var dataUrl = results.getImageDataUrl();
-      var html = '<img src="' + dataUrl + '">';
-      fs.write('/tmp/diff.html', html);
+      var pngHeader = 'data:image/png;base64,';
+      test.assertEquals(dataUrl.substr(0, pngHeader.length), pngHeader);
+      var data64 = dataUrl.substr(pngHeader.length);
+      var rawPngStr = base64.decodeToString(data64);
+
+      fs.write('/tmp/diff.png', rawPngStr, 'wb');
     }
 
     test.assertEquals(results.misMatchPercentage, "0.00", "Expected and actual screenshots match");
-    // The following will return the base64 representation of the pdiff results - highlighting areas 
-    // that are different
-    // results.getImageDataUrl();
   });
 
   casper.run(function() {
