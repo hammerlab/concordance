@@ -63,7 +63,6 @@ module.exports = {
   },
 
   takeScreenshot: function(casper, area) {
-    // To capture a screenshot to a file, use this:
     actual_screenshot = 'data:image/png;base64,' + casper.captureBase64('png', area);
     return actual_screenshot;
   },
