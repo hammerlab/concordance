@@ -62,13 +62,8 @@ module.exports = {
     });
   },
 
-  takeScreenshot: function(casper, opt_pathToPngFile) {
-    // To capture a screenshot to a file, use this:
-    actual_screenshot = 'data:image/png;base64,' + casper.captureBase64('png');
-    if (opt_pathToPngFile) {
-      casper.capture(opt_pathToPngFile);
-    }
-
+  takeScreenshot: function(casper, area) {
+    actual_screenshot = 'data:image/png;base64,' + casper.captureBase64('png', area);
     return actual_screenshot;
   },
 
