@@ -67,7 +67,7 @@ function d3_stackedBars() {
                         return s;
                     });
                     bar.total = sum(bar.map(function(s) { return sectionValue(s); }));
-                    bar.name = d.name;
+                    bar.name = barName(d);
                     return bar;
                 }),
                 barNames = data.map(function(d) {
@@ -108,7 +108,9 @@ function d3_stackedBars() {
                 .data(data)
               .enter().append("g")
                 .attr("class", "bar")
-                .attr("transform", function(d) { return "translate(" + xScale(barName(d)) + ", 0)"; });
+                .attr("transform", function(d) {
+                  return "translate(" + xScale(barName(d)) + ", 0)";
+                });
 
             var sections = bars.selectAll(".bar")
                 .data(function(d){return d;})

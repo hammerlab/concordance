@@ -32,19 +32,19 @@ _.sum = function(list) { return list.reduce(function(a,b){return a + b;}, 0); };
 // name).
 
 // Munge the FA data.
-var FA_data = {};
+var faData = {};
 callerNames.forEach(function(name) {
-  var data = _.map(dpfaBinning[name], function(sectionMap, barName) {
+  var data = _.map(window.dpfaBinning[name], function(sectionMap, barName) {
     var sections = _.map(_.keys(sectionMap), function(name) {
       return {name: name, value: sectionMap[name]};
     });
     sections.name = barName;
     return sections;
   });
-  FA_data[name] = data;
+  faData[name] = data;
 });
 
-var concordance_data = _.map(concordanceCounts, function(sectionMap, barName) {
+var concordanceData = _.map(window.concordanceCounts, function(sectionMap, barName) {
   var sections = _.map(_.keys(sectionMap), function(name) {
     return {name: name, value: sectionMap[name]};
   });
@@ -52,13 +52,13 @@ var concordance_data = _.map(concordanceCounts, function(sectionMap, barName) {
   return sections;
 });
 
-
+var scoreData = window.scores;
 
   ////////////////////
  // Visualizations //
 ////////////////////
 
-var fa_chart = d3.chart.stackedBars()
+var faChart = d3.chart.stackedBars()
     .xAxisTitle("Read Depth Range")
     .yAxisTitle("Number of Variants Called")
     .sectionBinDesc("frequency of allele")
@@ -75,11 +75,12 @@ var fa_chart = d3.chart.stackedBars()
 // Display the FA charts.
 callerNames.forEach(function(name) {
   d3.select("#" + name)
-      .datum(FA_data[name])
-      .call(fa_chart.title(name));
+      .datum(faData[name])
+      .call(faChart.title(name));
 });
 
-var concordance_chart = d3.chart.stackedBars()
+
+var concordanceChart = d3.chart.stackedBars()
     .title("Caller Concordance")
     .yAxisTitle("Number of Variants Called")
     .sectionBinDesc("callers in concordance")
@@ -93,8 +94,19 @@ var concordance_chart = d3.chart.stackedBars()
       return totalA - totalB;
     });
 
-d3.select("#conc").style("margin-top", "47px")
-    .datum(concordance_data)
-    .call(concordance_chart);
+// Display the Concordance chart.
+d3.select("#concordances").style("margin-top", "47px")
+    .datum(concordanceData)
+    .call(concordanceChart);
 
-displayScores(document.getElementById("prec-recall"), scores);
+displayScores(document.getElementById('scores'), scoreData)
+
+// var scoreChart = d3.chart.groupedBars()
+
+// // Display the scoring chart.
+// d3.select("#scores")
+//     .datum(scoreData)
+//     .call(scoreChart)
+//     .yAxisTitle("Score")
+//     .groupColors(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56",
+//                   "#d0743c", "#ff8c00"]);

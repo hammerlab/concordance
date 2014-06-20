@@ -1,11 +1,65 @@
-/**
- * Display a barchart of scores, grouped by score type (e.g. precision, recall)
- * and colored by variant caller.
- *
- * @param {!HTMLElement} el Element in which to display the score chart.
- * @param {Object.<string, Object.<string, number>>} scores An Object mapping
- *        callers to scores, which are mappings from score type to score.
- */
+(function(){
+
+function d3_groupedBars() {
+  var margin = {top: 30, right: 80, bottom: 30, left: 40},
+      width = 800 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom;
+
+  function chart(selection) {
+    selection.each(function(data) {
+
+    });
+  }
+
+  chart.margin = function(_) {
+    if (!arguments.length) return margin;
+    margin = _;
+    return chart;
+  };
+
+  chart.width = function(_) {
+    if (!arguments.length) return width;
+    width = _;
+    return chart;
+  };
+
+  chart.height = function(_) {
+    if (!arguments.length) return height;
+    height = _;
+    return chart;
+  };
+
+  chart.groupColors = function(_) {
+    if (!arguments.length) return stackColors;
+    stackColors = _;
+    return chart;
+  };
+
+  chart.title = function(_) {
+    if (!arguments.length) return title;
+    title = _;
+    return chart;
+  };
+
+  chart.xAxisTitle = function(_) {
+    if (!arguments.length) return xAxisTitle;
+    xAxisTitle = _;
+    return chart;
+  };
+
+  chart.yAxisTitle = function(_) {
+    if (!arguments.length) return yAxisTitle;
+    yAxisTitle = _;
+    return chart;
+  };
+
+}
+
+if (d3.chart === undefined)  d3.chart = {};
+d3.chart.groupedBars = d3_groupedBars;
+
+})();
+
 function displayScores(el, scores) {
   var data = [];
   var scoreNames = ['f1score', 'recall', 'precision'];
@@ -29,8 +83,8 @@ function displayScores(el, scores) {
   var x1 = d3.scale.ordinal();
 
   var y = d3.scale.linear()
-      .domain([0, 0.4, 0.8, 1])
-      .range([height, height/1.25, height/1.8, 0]);
+      .domain([0.75, 1])
+      .range([height, 0]);
 
   var color = d3.scale.ordinal()
       .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
@@ -69,15 +123,13 @@ function displayScores(el, scores) {
       .style("text-anchor", "end")
       .text("Score");
 
-  var groups = svg.selectAll(".group")
+  var parts = svg.selectAll(".part")
       .data(data)
     .enter().append("g")
-      .attr("class", "group")
-      .attr("transform", function(d) {
-        return "translate(" + (x1(d.name) + x0(d.type)) + ",0)";
-      });
+      .attr("class", "part")
+      .attr("transform", function(d) { return "translate(" + (x1(d.name) + x0(d.type)) + ",0)"; });
 
-  var bars = groups.selectAll(".bar")
+  var bars = parts.selectAll(".bar")
       .data(function(d) { return [d]; })
     .enter().append("rect")
       .attr('width', x1.rangeBand())
@@ -85,7 +137,7 @@ function displayScores(el, scores) {
       .attr('height', function(d) { return height - y(d.value); })
       .style('fill', function(d) { return color(d.name); });
 
-  groups.selectAll("text")
+  parts.selectAll("text")
     .data(function(d) { return [d]; })
     .enter().append("text")
       .attr('class', 'score-text')

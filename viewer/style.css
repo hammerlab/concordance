@@ -19,7 +19,6 @@ rect {
 
 .legend text {
   font-size: 1.1em;
-  text-anchor: start;
 }
 
 .axis path, .axis line {
@@ -32,10 +31,13 @@ rect {
   display: none;
 }
 
-#title {
+.x.axis .title {
+  font-weight: 700;
+}
+
+.chart > .title {
     font-weight: 700;
     font-size: 15px;
-    text-anchor: middle;
 }
 
 .fa.chart {
