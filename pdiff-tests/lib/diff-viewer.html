@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+  <title>Perceptual Diff Viewer</title>
+  <style>
+    #controls {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 20px;
+      padding: 10px;
+      box-shadow: 0px 5px 5px 0px rgba(50, 50, 50, 0.75);
+      background: white;
+    }
+    img {
+      margin: 5px;
+      margin-top: 50px;
+      border: 1px solid black;
+    }
+    #instructions {
+      margin-left: 100px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<div id="controls">
+<input onchange="change(event)" type=radio name=switcher id=actual file=actual.png checked><label for=actual> Actual (1)</label>
+<input onchange="change(event)" type=radio name=switcher id=expected file=expected.png><label for=expected> Expected (2)</label>
+<input onchange="change(event)" type=radio name=switcher id=diff file=diff.png><label for=diff> Diff (3)</label>
+
+<span id="instructions">
+Hit '1', '2' and '3' to switch between the images.
+</span>
+</div>
+
+<img id="image" src="actual.png">
+
+<script type="text/javascript">
+function change(e) {
+  document.getElementById('image').src = e.target.getAttribute('file');
+}
+document.onkeypress = function(e) {
+  var el;
+  if (e.keyCode == '1'.charCodeAt(0)) {
+    el = document.getElementById('actual');
+  } else if (e.keyCode == '2'.charCodeAt(0)) {
+    el = document.getElementById('expected');
+  } else if (e.keyCode == '3'.charCodeAt(0)) {
+    el = document.getElementById('diff');
+  }
+
+  if (el) {
+    var inputs = document.querySelectorAll('input');
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].removeAttribute('checked');
+    }
+    el.setAttribute('checked', true);
+    change({target:el});
+    e.preventDefault();
+  }
+};
+</script>
+</body>
+</html>
