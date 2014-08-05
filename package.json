@@ -11,5 +11,21 @@
     "assert": "*",
     "underscore": "*",
     "jquery": ">=2.0.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-casperjs": "^1.5.0",
+    "grunt-cli": "0.1.6",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-qunit": "~0.5.1",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-jscs-checker": "~0.4.4",
+    "grunt-qunit-cov": "~0.3.6",
+    "grunt-qunit-junit": "~0.1.0",
+    "pdiffy": "^0.3.0",
+    "qunitjs": "^1.14.0"
+  },
+  "scripts": {
+    "test": "grunt travis"
   }
 }
