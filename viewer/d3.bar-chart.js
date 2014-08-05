@@ -1,5 +1,4 @@
 // TODO
-// 0. label stacks within groups (if requested)
 // 1. legend positiong (and consequent chart resizing)
 //    c.f. HACK margin.right and svgWidth default.
 // 2. allow filtering bars, stacks
@@ -8,10 +7,6 @@
 // 5. allow smart axes (e.g. show ticks n bars apart, etc)
 
 (function(){
-
-function sum(arr) {
-  return arr.reduce(function(a, v){ return a + v; }, 0);
-}
 
 function uniq(list) {
   return list.reduce(function(a,v){
@@ -30,17 +25,6 @@ function getter(name) {
   }
 }
 
-function hash(obj) {
-  var str = JSON.stringify(obj),
-      hash = 0;
-  if (str.length == 0) return hash;
-  for (i = 0; i < str.length; i++) {
-    var char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash;
-}
 
 function d3_bars() {
 
@@ -50,9 +34,8 @@ function d3_bars() {
       groupScale = d3.scale.ordinal(),
       intraGroupScale = d3.scale.ordinal(),
       barHeightScale = d3.scale.linear(),
+      _customBarHeightScale = false,
       intraBarScale = d3.scale.ordinal(),
-      xAxis = d3.svg.axis().scale(groupScale).orient("bottom"),
-      yAxis = d3.svg.axis().scale(barHeightScale).orient("left"),
       barValue = function(d, i) { return d; },
       _idxGetter = getter('__index__'),
       groupBy = _idxGetter,
@@ -61,15 +44,14 @@ function d3_bars() {
       interStackSorter = null,
       intraStackSorter = function() { return 1; },
       colors = ['#ffffff', '#000000'],
-      barLabel = function(d, i) { return ""; },
-      stackLabel = function(d, i) { return ""; },
+      barLabel = null,
+      stackLabel = null,
+      stackLabelPosition = "bottom",
       yAxisTitle = "",
       xAxisTitle = "",
       title = "",
       interGroupPadding = 0,
-      intraGroupPadding = 0, // why must it be this to not have spaces? (oh,
-                             // rangeRoundBAND <- to make it snap to nearest
-                             // pixel....hmm
+      intraGroupPadding = 0,
       yTickFormatter = function(d) { return d; },
       xTickFormatter = function(d) { return d; },
       legendLabeler = function(d, i) { return d; },
@@ -78,13 +60,21 @@ function d3_bars() {
 
 
   function chart(selection) {
-    chartWidth = svgWidth - margin.right - margin.left;
-    chartHeight = svgHeight - margin.top - margin.bottom;
+    var chartWidth = svgWidth - margin.right - margin.left,
+        chartHeight = svgHeight - margin.top - margin.bottom,
+        xAxis = d3.svg.axis().scale(groupScale).orient("bottom"),
+        yAxis = d3.svg.axis().scale(barHeightScale).orient("left");
+
+    if (stackLabel && stackLabelPosition === 'bottom') {
+      // TODO(ihodes): Choose a dynamic height, not just 10%
+      //               to make room for stackLabel.
+      chartHeight = chartHeight - (chartHeight * 0.1); // to make room for the stackLabel
+    }
 
     selection.each(function(data) {
 
       // TODO(ihodes): HACK! This is not ideal. If nest().key(fn) passed indices
-      //               to fn, then we wouldn't need to do this. HACK!
+      //               to fn, then we wouldn't need to do this.
       if (typeof data[0] === 'object') {
         data = data.map(function(d,i) { d.__index__ = i; return d; });
       }
@@ -131,10 +121,11 @@ function d3_bars() {
           .domain(d3.range(0, maxGroupSize))
           .rangeBands([0, groupScale.rangeBand()], intraGroupPadding);
 
-
-      barHeightScale
+      if (!_customBarHeightScale) {
+        barHeightScale
           .domain([minStackValue, maxStackValue])
           .rangeRound([chartHeight, 0]);
+      }
 
       intraBarScale
           .domain(d3.range(0, maxStackSize))
@@ -166,7 +157,11 @@ function d3_bars() {
           });
 
       var stacks = groups.selectAll(".stack")
-          .data(function(d) { return d.values.sort(function(a,b){ return intraStackSorter(a.key, b.key); }) })
+          .data(function(d) {
+            return d.values.sort(function(a,b) {
+              return intraStackSorter(a.key, b.key);
+            });
+          })
         .enter().append("g")
           .attr("class", "stack")
           .attr("transform", function(d, i) {
@@ -208,20 +203,40 @@ function d3_bars() {
           });
 
       // TODO(ihodes): WIP
-      stacks.append("text")
-        .attr("transform", "rotate(-50)")
-        .attr("dy", intraGroupScale.rangeBand()/2 - 14)
-        .attr("dx", "6em")
-        .style("text-anchor", "end")
-        .text(function(d, idx) { return stackLabel(d.values, d.key, idx) });
+      if (stackLabel) {
+        var t = stacks.append("text").attr("class", "stackText");
+        if (stackLabelPosition === "bottom") {
+          t
+            .attr("transform", "rotate(-50 20,"+(chartHeight+10)+")")
+            .attr("dx", 20) // TODO(ihodes): position properly...
+            .attr("dy", chartHeight+10)
+            .style("text-anchor", "end");
+        } else if (stackLabelPosition === "top") {
+          t
+            .attr("transform", function(d, i) {
+              var pos = barHeightScale(d3.sum(d.values, barValue));
+              return "translate(0,"+ (pos-3) +")";
+            })
+            .attr("dx", intraGroupScale.rangeBand()/2)
+            .style("text-anchor", "middle");
+        }
+        // TODO(ihodes): Why d.key instead of just d? Is this a good API to
+        //               pass d.values and d.key?) Should I just pass `d`
+        //               instead? (I think it is a good idea... just want to
+        //               be sure)
+        t.text(function(d, idx) { return stackLabel(d.values, d.key, idx); });
+      }
 
-
-      bars.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("dy", intraGroupScale.rangeBand()/2)
-        .attr("dx", "-1em")
-        .style("text-anchor", "end")
-        .text(barLabel);
+      if (barLabel) {
+        bars.append("text")
+          .attr("class", "barText")
+          .attr("transform", "rotate(-90)")
+          .attr("dy", intraGroupScale.rangeBand() / 2 + 4) // TODO(ihodes):
+                                                           // position properly
+          .attr("dx", "-1em")
+          .style("text-anchor", "end")
+          .text(barLabel); // TODO(ihodes): should be similar to the above stackLabel
+      }
 
 
         ///////////////////
@@ -232,22 +247,27 @@ function d3_bars() {
         .append("text")
           .text(title)
           .style("text-anchor", "middle")
-          .attr("class", "title")
+          .attr("class", "chartTitle")
           .attr("transform", "translate(" + chartWidth/2 + "," + -margin.top/2  + ")")
 
       xAxis
         .tickFormat(xTickFormatter);
 
+      var xAxisPos = chartHeight;
+      if (stackLabel && stackLabelPosition === 'bottom') {
+        xAxisPos = xAxisPos / 0.9; // We shaved off 0.1 from the top of
+                                   // chartHeight because of stackLabel earlier.
+      }
+
       var xAxisGroup = svg.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(0, " + chartHeight + ")")
+          .attr("transform", "translate(0, " + xAxisPos + ")")
           .call(xAxis);
 
       xAxisGroup.append("text")
           .attr("y", 30)
           .attr("x", chartWidth/2)
           .attr("dy", ".71em")
-          .attr("class", "title")
           .style("text-anchor", "middle")
           .text(xAxisTitle);
 
@@ -283,12 +303,14 @@ function d3_bars() {
           .attr("x", chartWidth + margin.left - 23)
           .attr("width", 18)
           .attr("height", 18)
+          .attr("class", "legendColorBox")
           .style("fill", color);
 
       legend.append("text")
           .attr("x", chartWidth + margin.left + 6 + 18 - 23)
           .attr("y", 9)
           .attr("dy", ".35em")
+          .attr("class", "legendText")
           .text(function(d) { return legendLabeler(d); });
     });
   }
@@ -321,6 +343,13 @@ function d3_bars() {
   chart.xLabel = function(_) {
     if (!arguments.length) return xAxisTitle;
     xAxisTitle = _;
+    return chart;
+  };
+
+  chart.yScale = function(_) {
+    if (!arguments.length) return barHeightScale;
+    barHeightScale = _;
+    _customBarHeightScale = true;
     return chart;
   };
 
@@ -368,13 +397,19 @@ function d3_bars() {
 
   chart.barLabel = function(_) {
     if (!arguments.length) return barLabel;
-    barLabel = typeof _ === 'function' ? _ : function() { return _; };
+    barLabel = typeof _ === 'function' ? _ : getter(_);
     return chart;
   };
 
   chart.stackLabel = function(_) {
     if (!arguments.length) return stackLabel;
     stackLabel = typeof _ === 'function' ? _ : getter(_);
+    return chart;
+  };
+
+  chart.stackLabelPosition = function(_) {
+    if (!arguments.length) return stackLabelPosition;
+    stackLabelPosition = _;
     return chart;
   };
 

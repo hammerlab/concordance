@@ -6,29 +6,23 @@
   </head>
   <body>
     <h1>Variant Calls by Read Depth and Frequency of Allele</h1>
-    <div class="fa chart" id="somatic-sniper"></div>
-    <div class="fa chart" id="mutect"></div>
-    <div class="fa chart" id="strelka"></div>
-    <div class="fa chart" id="varscan"></div>
-
-    <h1>Concordance between callers</h1>
-    <div id="concordances"></div>
-
+    <div id="bars"></div>
     <h1>Caller Scores (f1, recall, precision)</h1>
-    <div id="scores"></div>
+    <div id="bars-scores"></div>
+    <h1>Concordance between callers</h1>
+    <div id="bars-conc"></div>
 
     <!-- Vendor -->
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="http://underscorejs.org/underscore-min.js"></script>
+    <script src="d3.min.js"></script>
+    <script src="underscore-min.js"></script>
 
     <!-- Lib: define visuals. -->
-    <script src="d3.stacked-bar-chart.js"></script>
+    <script src="d3.bar-chart.js"></script>
 
     <!-- Data -->
     <script src="concordance-data.js"></script>
 
     <!-- Src: Init and display visualizations. -->
-    <script src="display-scores.js"></script>
-    <script src="display-concordance.js"></script>
+    <script src="bars-test.js"></script>
   </body>
 </html>
